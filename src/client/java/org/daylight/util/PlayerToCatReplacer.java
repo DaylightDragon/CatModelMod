@@ -9,7 +9,6 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.entity.passive.CatVariant;
-import net.minecraft.entity.passive.CatVariants;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -24,15 +23,16 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Environment(EnvType.CLIENT)
 public class PlayerToCatReplacer {
     public static final Logger LOGGER = LoggerFactory.getLogger(CatModelModClient.MOD_ID);
     private static final MinecraftClient client = MinecraftClient.getInstance();
-    private static final Map<AbstractClientPlayerEntity, LivingEntity> dummyModelMap = new HashMap<>();
+    private static final Map<UUID, LivingEntity> dummyModelMap = new HashMap<>();
     private static World targetWorld;
 
-    public static void init() {
+    public static void initWorld() {
         if (client == null || client.world == null) return;
         targetWorld = client.world;
 
@@ -40,7 +40,7 @@ public class PlayerToCatReplacer {
     }
 
     public static void replaceWithCat(AbstractClientPlayerEntity player) {
-        if (dummyModelMap.containsKey(player)) return;
+        if (dummyModelMap.containsKey(player.getUuid())) return;
 
         CatEntity cat = new CatEntity(EntityType.CAT, targetWorld);
         changeCatVariant(cat, CatVariantUtils.deserializeVariant(ConfigHandler.catVariant.get()));
@@ -52,7 +52,7 @@ public class PlayerToCatReplacer {
         cat.setAiDisabled(true);
         cat.setPosition(player.getX(), player.getY(), player.getZ());
 
-        dummyModelMap.put(player, cat);
+        dummyModelMap.put(player.getUuid(), cat);
     }
 
     private static RegistryEntry<CatVariant> getCatVariant(RegistryKey<CatVariant> variantKey) {
@@ -83,12 +83,12 @@ public class PlayerToCatReplacer {
     }
 
     public static boolean shouldReplace(AbstractClientPlayerEntity player) {
-        return dummyModelMap.containsKey(player) &&
+        return dummyModelMap.containsKey(player.getUuid()) &&
                 player == MinecraftClient.getInstance().player;
     }
 
     public static LivingEntity getCatForPlayer(AbstractClientPlayerEntity player) {
-        return dummyModelMap.get(player);
+        return dummyModelMap.get(player.getUuid());
     }
 
     public static boolean isDummyCat(CatEntity catEntity) {

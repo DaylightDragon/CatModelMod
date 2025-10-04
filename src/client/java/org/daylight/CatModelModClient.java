@@ -19,28 +19,26 @@ public class CatModelModClient implements ClientModInitializer {
 	public static final String MOD_ID = "modernatt1";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	private static final MinecraftClient client = MinecraftClient.getInstance();
+    AtomicBoolean checked = new AtomicBoolean(false);
 
 	@Override
 	public void onInitializeClient() {
-//        LOGGER.info("Meow " + PlayerToCatReplacer.serializeVariant(CatVariants.ALL_BLACK));
-//        LOGGER.info("Meow " + PlayerToCatReplacer.deserializeVariant("ALL_BLACK"));
+        ModCommands.register();
+        ConfigHandler.init();
 
 		ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register((handler, world) -> {
 			if (world != null) {
-				PlayerToCatReplacer.init();
-                ModCommands.register();
-                ConfigHandler.init();
-
-				// Однократная проверка через 1 тик
-				AtomicBoolean checked = new AtomicBoolean(false);
-				ClientTickEvents.START_CLIENT_TICK.register(client -> {
-					if (!checked.get() && client.player != null) {
-						PlayerToCatReplacer.replaceWithCat(client.player);
-						checked.set(true);
-					}
-				});
+				PlayerToCatReplacer.initWorld();
+                checked.set(false);
 			}
 		});
+
+        ClientTickEvents.START_CLIENT_TICK.register(client -> {
+            if (!checked.get() && client.player != null) {
+                PlayerToCatReplacer.replaceWithCat(client.player);
+                checked.set(true);
+            }
+        });
 
 		//ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE
 		// This entrypoint is suitable for setting up client-specific logic, such as rendering.

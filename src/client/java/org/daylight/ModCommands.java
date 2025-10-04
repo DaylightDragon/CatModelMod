@@ -48,13 +48,13 @@ public class ModCommands {
                                     ConfigHandler.catVariant.save();
 
                                     client.player.sendMessage(
-                                            Text.literal("§aSet variant: " + name),
+                                            Text.literal("§6Set variant: §l§f" + name.toLowerCase(Locale.ROOT)),
                                             false
                                     );
                                     return 1;
                                 } catch (Exception e) {
                                     client.player.sendMessage(
-                                            Text.literal("§cUnknown variant: " + variantName),
+                                            Text.literal("§cUnknown variant: §l§f" + variantName.toLowerCase(Locale.ROOT)),
                                             false
                                     );
                                     return 0;

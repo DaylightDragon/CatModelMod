@@ -62,10 +62,10 @@ public abstract class EntityRenderDispatcherMixin {
                         var playerState = getRenderer(player).getAndUpdateRenderState(player, tickDelta);
                         renderHitboxes(matrices, playerState, playerState.hitbox, vertexConsumers);
                     }
-
-                    matrices.pop();
                 } catch (ClassCastException e) {
                     CatModelModClient.LOGGER.error("The renderer is most likely not a EntityRenderer<CatEntity, EntityRenderState>", e);
+                } finally {
+                    matrices.pop();
                 }
             }
         }
