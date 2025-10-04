@@ -238,4 +238,23 @@ public class PlayerToCatReplacer {
     public static boolean isDummyCat(CatEntity catEntity) {
         return dummyModelMap.containsValue(catEntity); // && player == MinecraftClient.getInstance().player;
     }
+
+    public static void syncEntity2(AbstractClientPlayerEntity player, CatEntity existingCat) {
+        existingCat.lastX = player.lastX;
+        existingCat.lastY = player.lastY;
+        existingCat.lastZ = player.lastZ;
+        existingCat.setPos(player.getX(), player.getY(), player.getZ());
+
+        existingCat.lastYaw = player.lastYaw;
+        existingCat.setYaw(player.getYaw());
+
+        existingCat.lastPitch = player.lastPitch;
+        existingCat.setPitch(player.getPitch());
+
+        existingCat.lastBodyYaw = player.lastBodyYaw;
+        existingCat.bodyYaw = player.bodyYaw;
+
+        existingCat.lastHeadYaw = player.lastHeadYaw;
+        existingCat.headYaw = player.headYaw;
+    }
 }

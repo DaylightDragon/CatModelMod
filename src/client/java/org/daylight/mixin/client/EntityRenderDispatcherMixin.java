@@ -1,14 +1,20 @@
 package org.daylight.mixin.client;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.render.entity.state.EntityRenderState;
 import net.minecraft.client.render.entity.state.LivingEntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.CatEntity;
+import net.minecraft.entity.passive.CatVariants;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.math.Vec3d;
 import org.daylight.ModernAtt1Client;
 import org.daylight.PlayerToCatReplacer;
@@ -27,9 +33,7 @@ public abstract class EntityRenderDispatcherMixin {
     )
     private <E extends Entity> void onRenderEntity(
             E entity,
-            double x,
-            double y,
-            double z,
+            double x, double y, double z,
             float tickDelta,
             MatrixStack matrices,
             VertexConsumerProvider vertexConsumers,
@@ -38,42 +42,25 @@ public abstract class EntityRenderDispatcherMixin {
     ) {
         if (entity instanceof AbstractClientPlayerEntity player &&
                 PlayerToCatReplacer.shouldReplace(player)) {
-            ci.cancel();
 
-            CatEntity cat = (CatEntity) PlayerToCatReplacer.getCatForPlayer(player);
+            CatEntity existingCat = (CatEntity) PlayerToCatReplacer.getCatForPlayer(player);
 
-            if (cat != null) {
-                ci.cancel(); // Отменяем рендер игрока
+            if (existingCat != null) {
 
-                // Сохраняем текущую матрицу
+                PlayerToCatReplacer.syncEntity2(player, existingCat);
+//                existingCat.copyFrom(player);
+//                existingCat.setPos(player.getX(), player.getY() - 2, player.getZ());
+
                 matrices.push();
+                matrices.translate(x, y, z);
 
-                try {
-                    // Сбрасываем трансформацию игрока
-                    matrices.loadIdentity();
+                ci.cancel();
 
-                    // Используем РЕАЛЬНУЮ позицию кота, а не игрока
-                    Vec3d catPos = cat.getPos();
-                    double catX = catPos.x;
-                    double catY = catPos.y;
-                    double catZ = catPos.z;
+                EntityRenderer<CatEntity, EntityRenderState> catRenderer = this.getRenderer(existingCat);
+                var catState = catRenderer.getAndUpdateRenderState(existingCat, tickDelta);
+                catRenderer.render(catState, matrices, vertexConsumers, light);
 
-                    // Получаем рендерер для кота
-                    EntityRenderer<?, ?> catRenderer = this.getRenderer(cat);
-
-                    // Рендерим кота в его реальной позиции
-                    this.render(
-                            cat,
-                            x, y, z,
-                            tickDelta,
-                            matrices,
-                            vertexConsumers,
-                            light,
-                            catRenderer
-                    );
-                } finally {
-                    matrices.pop();
-                }
+                matrices.pop();
             }
         }
     }
@@ -91,49 +78,63 @@ public abstract class EntityRenderDispatcherMixin {
             int light,
             EntityRenderer renderer
     ) {}
+    
+    private void copyValues(CatEntity existingCat, PlayerEntity player) {
+        existingCat.setPos(player.getX(), player.getY(), player.getZ());
 
-    private static LivingEntityRenderState createRenderState(LivingEntity entity) {
-        LivingEntityRenderState state = new LivingEntityRenderState();
+        existingCat.lastYaw = player.lastYaw;
+        existingCat.setYaw(player.getYaw());
 
-        // Заполняем основные параметры
-        state.bodyYaw = entity.bodyYaw;
-        state.relativeHeadYaw = entity.getHeadYaw();
-        state.pitch = entity.getPitch();
-        state.limbSwingAnimationProgress = entity.limbAnimator.getAnimationProgress();
-        state.limbSwingAmplitude = entity.limbAnimator.getSpeed();
+        existingCat.lastPitch = player.lastPitch;
+        existingCat.setPitch(player.getPitch());
 
-        // Специфичные параметры
-        state.hurt = entity.hurtTime > 0;
-        state.pose = entity.getPose();
+        existingCat.bodyYaw = player.bodyYaw;
+        existingCat.lastBodyYaw = player.lastBodyYaw;
 
-        return state;
+        existingCat.headYaw = player.headYaw;
+        existingCat.lastHeadYaw = player.lastHeadYaw;
     }
 
-    private void copyRenderState(LivingEntityRenderState source, LivingEntityRenderState target) {
-        // Копируем все видимые поля
-        target.bodyYaw = source.bodyYaw;
-        target.relativeHeadYaw = source.relativeHeadYaw;
-        target.pitch = source.pitch;
-        target.deathTime = source.deathTime;
-        target.limbSwingAnimationProgress = source.limbSwingAnimationProgress;
-        target.limbSwingAmplitude = source.limbSwingAmplitude;
-        target.baseScale = source.baseScale;
-        target.ageScale = source.ageScale;
-        target.flipUpsideDown = source.flipUpsideDown;
-        target.shaking = source.shaking;
-        target.baby = source.baby;
-        target.touchingWater = source.touchingWater;
-        target.usingRiptide = source.usingRiptide;
-        target.hurt = source.hurt;
-        target.invisibleToPlayer = source.invisibleToPlayer;
-        target.hasOutline = source.hasOutline;
-        target.sleepingDirection = source.sleepingDirection;
-        target.customName = source.customName;
-        target.pose = source.pose;
-        target.headItemAnimationProgress = source.headItemAnimationProgress;
-        target.wearingSkullType = source.wearingSkullType;
-        target.wearingSkullProfile = source.wearingSkullProfile;
+    private CatEntity createRenderCat(AbstractClientPlayerEntity player, float tickDelta) {
+        // Создаем кота без добавления в мир
+        CatEntity cat = new CatEntity(EntityType.CAT, MinecraftClient.getInstance().world);
 
-//        ((LivingEntityRenderStateAccessor) target).setEntity(newEntity);
+        // Базовая настройка
+        setupRenderCat(cat);
+
+        // Синхронизация с игроком
+        syncRenderCat(cat, player, tickDelta);
+
+        return cat;
+    }
+
+    private void setupRenderCat(CatEntity cat) {
+        // Настройка внешности (вариант, имя и т.д.)
+        try {
+            var registry = MinecraftClient.getInstance().world.getRegistryManager().getOrThrow(RegistryKeys.CAT_VARIANT);
+            var variant = registry.getEntry(CatVariants.ALL_BLACK.getRegistry());
+            if (variant.isPresent() && cat instanceof CatEntityAccessor catEntityAccessor) {
+                catEntityAccessor.invokeSetVariant(variant.get());
+            }
+        } catch (Exception e) {
+            // Игнорируем ошибки
+        }
+
+//        cat.setTamed(true, false);
+    }
+
+    private void syncRenderCat(CatEntity cat, AbstractClientPlayerEntity player, float tickDelta) {
+        // Только визуальные параметры - позиция не нужна, так как используем translate
+        cat.setYaw(player.getYaw());
+        cat.setPitch(player.getPitch());
+        cat.setHeadYaw(player.getHeadYaw());
+        cat.setBodyYaw(player.getBodyYaw());
+
+        // Анимации
+        double dx = player.getX() - player.lastX;
+        double dz = player.getZ() - player.lastZ;
+        double horizontalSpeed = Math.sqrt(dx * dx + dz * dz);
+        float targetSpeed = Math.min((float)horizontalSpeed * 20.0f, 1.0f);
+        cat.limbAnimator.updateLimbs(targetSpeed, 0.5f, 1.0f);
     }
 }
