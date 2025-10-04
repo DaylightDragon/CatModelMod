@@ -1,0 +1,14 @@
+{
+	"required": true,
+	"package": "org.daylight.mixin.client",
+	"compatibilityLevel": "JAVA_21",
+	"client": [
+        "CatEntityAccessor",
+        "EntityRenderDispatcherMixin",
+        "CatEntityMixin"
+	],
+    "verbose": false,
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
