@@ -5,10 +5,10 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents;
-import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.world.WorldEvents;
+import org.daylight.config.ConfigHandler;
+import org.daylight.util.PlayerToCatReplacer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,9 +22,14 @@ public class ModernAtt1Client implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
+//        LOGGER.info("Meow " + PlayerToCatReplacer.serializeVariant(CatVariants.ALL_BLACK));
+//        LOGGER.info("Meow " + PlayerToCatReplacer.deserializeVariant("ALL_BLACK"));
+
 		ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register((handler, world) -> {
 			if (world != null) {
-				PlayerToCatReplacer.initFakeWorld();
+				PlayerToCatReplacer.init();
+                ModCommands.register();
+                ConfigHandler.init();
 
 				// Однократная проверка через 1 тик
 				AtomicBoolean checked = new AtomicBoolean(false);

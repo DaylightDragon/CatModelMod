@@ -6,18 +6,17 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.state.EntityRenderState;
-import net.minecraft.client.render.entity.state.LivingEntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.entity.passive.CatVariants;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.RegistryKeys;
-import net.minecraft.util.math.Vec3d;
 import org.daylight.ModernAtt1Client;
-import org.daylight.PlayerToCatReplacer;
+import org.daylight.config.ConfigHandler;
+import org.daylight.util.CatVariantUtils;
+import org.daylight.util.PlayerToCatReplacer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,6 +25,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EntityRenderDispatcher.class)
 public abstract class EntityRenderDispatcherMixin {
+    @SuppressWarnings("unchecked")
     @Inject(
             method = "render(Lnet/minecraft/entity/Entity;DDDFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",
             at = @At("HEAD"),
@@ -52,13 +52,17 @@ public abstract class EntityRenderDispatcherMixin {
                 matrices.push();
                 matrices.translate(x, y, z);
 
-                ci.cancel();
+                try {
+                    EntityRenderer<CatEntity, EntityRenderState> catRenderer = this.getRenderer(existingCat);
+                    ci.cancel();
 
-                EntityRenderer<CatEntity, EntityRenderState> catRenderer = this.getRenderer(existingCat);
-                var catState = catRenderer.getAndUpdateRenderState(existingCat, tickDelta);
-                catRenderer.render(catState, matrices, vertexConsumers, light);
+                    var catState = catRenderer.getAndUpdateRenderState(existingCat, tickDelta);
+                    catRenderer.render(catState, matrices, vertexConsumers, light);
 
-                matrices.pop();
+                    matrices.pop();
+                } catch (ClassCastException e) {
+                    ModernAtt1Client.LOGGER.error("The renderer is most likely not a EntityRenderer<CatEntity, EntityRenderState>", e);
+                }
             }
         }
     }
@@ -110,7 +114,7 @@ public abstract class EntityRenderDispatcherMixin {
         // Настройка внешности (вариант, имя и т.д.)
         try {
             var registry = MinecraftClient.getInstance().world.getRegistryManager().getOrThrow(RegistryKeys.CAT_VARIANT);
-            var variant = registry.getEntry(CatVariants.ALL_BLACK.getRegistry());
+            var variant = registry.getEntry(CatVariantUtils.deserializeVariant(ConfigHandler.catVariant.get()).getRegistry());
             if (variant.isPresent() && cat instanceof CatEntityAccessor catEntityAccessor) {
                 catEntityAccessor.invokeSetVariant(variant.get());
             }
