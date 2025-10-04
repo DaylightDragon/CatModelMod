@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Environment(EnvType.CLIENT)
-public class ModernAtt1Client implements ClientModInitializer {
+public class CatModelModClient implements ClientModInitializer {
 	public static final String MOD_ID = "modernatt1";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	private static final MinecraftClient client = MinecraftClient.getInstance();

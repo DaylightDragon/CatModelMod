@@ -1,31 +1,31 @@
 {
 	"schemaVersion": 1,
-	"id": "modernatt1",
+	"id": "catmodel",
 	"version": "${version}",
-	"name": "ModernAtt1",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"name": "CatModel",
+	"description": "A mod that turns your player model into a cat! :D",
 	"authors": [
-		"Me!"
+		"Daylight"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",
 		"sources": "https://github.com/FabricMC/fabric-example-mod"
 	},
 	"license": "CC0-1.0",
-	"icon": "assets/modernatt1/icon.png",
+	"icon": "assets/catmodel/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"org.daylight.ModernAtt1"
+          "org.daylight.CatModelMod"
 		],
 		"client": [
-			"org.daylight.ModernAtt1Client"
+          "org.daylight.CatModelModClient"
 		]
 	},
 	"mixins": [
-		"modernatt1.mixins.json",
+      "catmodel.mixins.json",
 		{
-			"config": "modernatt1.client.mixins.json",
+			"config": "catmodel.client.mixins.json",
 			"environment": "client"
 		}
 	],

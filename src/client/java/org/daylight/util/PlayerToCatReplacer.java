@@ -13,22 +13,21 @@ import net.minecraft.entity.passive.CatVariants;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import org.daylight.ModernAtt1Client;
+import org.daylight.CatModelModClient;
+import org.daylight.config.ConfigHandler;
 import org.daylight.mixin.client.CatEntityAccessor;
 import org.daylight.mixin.client.LimbAnimatorAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 @Environment(EnvType.CLIENT)
 public class PlayerToCatReplacer {
-    public static final Logger LOGGER = LoggerFactory.getLogger(ModernAtt1Client.MOD_ID);
+    public static final Logger LOGGER = LoggerFactory.getLogger(CatModelModClient.MOD_ID);
     private static final MinecraftClient client = MinecraftClient.getInstance();
     private static final Map<AbstractClientPlayerEntity, LivingEntity> dummyModelMap = new HashMap<>();
     private static World targetWorld;
@@ -44,7 +43,7 @@ public class PlayerToCatReplacer {
         if (dummyModelMap.containsKey(player)) return;
 
         CatEntity cat = new CatEntity(EntityType.CAT, targetWorld);
-        changeCatVariant(cat, CatVariants.BLACK);
+        changeCatVariant(cat, CatVariantUtils.deserializeVariant(ConfigHandler.catVariant.get()));
         cat.setTamed(true, false);
 //        cat.setOwner(player);
 
@@ -114,26 +113,38 @@ public class PlayerToCatReplacer {
         existingCat.lastHeadYaw = player.lastHeadYaw;
         existingCat.headYaw = player.headYaw;
 
-//        double dx = player.getX() - player.lastX;
-//        double dz = player.getZ() - player.lastZ;
-//        float limbSpeed = (float)(dx * dx + dz * dz);
+        // Sitting
+        double dx = player.getX() - player.lastX;
+        double dz = player.getZ() - player.lastZ;
+        double horizontalSpeed = Math.sqrt(dx * dx + dz * dz);
+
+        boolean sneaking = player.isSneaking(); // or isInSneakingPose()
+        boolean slowEnough = horizontalSpeed < 0.01;
+
+        boolean sitting = sneaking && slowEnough;
+        existingCat.setInSittingPose(sitting);
+
+//        if (sitting) {
+//            // сбросить движение лап
+//            existingCat.limbAnimator.updateLimbs(0.0f, 1.0f, 1.0f);
 //
-//        // vanilla: sqrt + *4
-//        limbSpeed = MathHelper.sqrt(limbSpeed) * 4.0f;
-//        if (limbSpeed > 1.0f) limbSpeed = 1.0f;
+//            if (existingCat.limbAnimator instanceof LimbAnimatorAccessor acc) {
+//                acc.setAnimationProgress(0.0f);
+//            }
+//        } else {
+
+//        System.out.println(getPlayerMovementSpeed(player) + " " + player.limbAnimator.getAnimationProgress());
 
         existingCat.limbAnimator.updateLimbs(
-                getPlayerMovementSpeed(player), // player.limbAnimator.getSpeed(),      // скорость движений ног игрока
-                0.9f,                                // скорость реакции (1.0f = мгновенно повторяет)
-                1.0f // existingCat.isBaby() ? 2.0f :
+                getPlayerMovementSpeed(player),
+                0.9f,
+                1.0f
         );
 
-        if(existingCat.limbAnimator instanceof LimbAnimatorAccessor limbAnimatorAccessor) {
-            limbAnimatorAccessor.setAnimationProgress(player.limbAnimator.getAnimationProgress());
-//            System.out.println(limbAnimatorAccessor.getAnimationProgress());
+        if (existingCat.limbAnimator instanceof LimbAnimatorAccessor acc) {
+            acc.setAnimationProgress(player.limbAnimator.getAnimationProgress());
         }
-
-//        existingCat.limbAnimator.animationProgress = player.limbAnimator.getAnimationProgress();
+//        }
     }
 
     private static float getPlayerMovementSpeed(AbstractClientPlayerEntity player) {
@@ -143,7 +154,9 @@ public class PlayerToCatReplacer {
         double horizontalSpeed = Math.sqrt(dx * dx + dz * dz);
 
         // Нормализуем скорость для анимаций
-        float speed = (float) horizontalSpeed * 20.0f;
+        float speed = (float) horizontalSpeed * 4f; // 20.0f;
+
+//        System.out.println(horizontalSpeed);
 
         // Ограничиваем максимальную скорость
         return Math.min(speed, 1.0f);
