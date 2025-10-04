@@ -6,7 +6,8 @@
         "CatEntityAccessor",
         "EntityRenderDispatcherMixin",
         "CatEntityMixin",
-        "LimbAnimatorAccessor"
+        "LimbAnimatorAccessor",
+        "PlayerEntityRendererMixin"
 	],
     "verbose": false,
 	"injectors": {

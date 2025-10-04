@@ -38,10 +38,15 @@ dependencies {
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	
 }
 
 processResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    from("src/main/resources") { // remove this and above when works
+        include "**/*.png"
+    }
+
 	inputs.property "version", project.version
 
 	filesMatching("fabric.mod.json") {

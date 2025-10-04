@@ -3,6 +3,7 @@ package org.daylight;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
@@ -16,7 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @Environment(EnvType.CLIENT)
 public class CatModelModClient implements ClientModInitializer {
-	public static final String MOD_ID = "modernatt1";
+	public static final String MOD_ID = "catmodel";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	private static final MinecraftClient client = MinecraftClient.getInstance();
     AtomicBoolean checked = new AtomicBoolean(false);
@@ -24,7 +25,14 @@ public class CatModelModClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
         ModCommands.register();
+        ModResources.init();
         ConfigHandler.init();
+
+        ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
+            ModResources.postInit();
+            var res = client.getResourceManager().getResource(ModResources.CAT_HAND_TEXTURE);
+            System.out.println("Resource found at client start: " + res.isPresent());
+        });
 
 		ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register((handler, world) -> {
 			if (world != null) {

@@ -20,6 +20,11 @@ public class ModCommands {
             "british_shorthair", "calico", "persian",
             "ragdoll", "white", "jellie", "all_black"
     );
+
+    private static final List<String> MODES_OF_OFF = List.of(
+            "on", "off"
+    );
+
     public static void register() {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(ClientCommandManager.literal("catvariant")
@@ -54,13 +59,53 @@ public class ModCommands {
                                     return 1;
                                 } catch (Exception e) {
                                     client.player.sendMessage(
-                                            Text.literal("§cUnknown variant: §l§f" + variantName.toLowerCase(Locale.ROOT)),
+                                            Text.literal("§cUnknown variant: §l§f" + variantName),
                                             false
                                     );
                                     return 0;
                                 }
                             })
                     )
+            );
+
+            dispatcher.register(ClientCommandManager.literal("catactive")
+                .then(ClientCommandManager.argument("state", StringArgumentType.word())
+                    .suggests((context, builder) -> {
+                        for (String v : MODES_OF_OFF) {
+                            if (v.startsWith(builder.getRemaining().toUpperCase(Locale.ROOT))) {
+                                builder.suggest(v);
+                            }
+                        }
+                        return builder.buildFuture();
+                    })
+                    .executes(context -> {
+                        MinecraftClient mc = MinecraftClient.getInstance();
+                        String stateStr = StringArgumentType.getString(context, "state");
+
+                        boolean state = true;
+                        if(stateStr.equals("on")) {
+                            state = true;
+                        } else if(stateStr.equals("off")) {
+                            state = false;
+                        }  else {
+                            if(mc != null && mc.player != null) mc.player.sendMessage(
+                                Text.literal("§cUnexpected value: §l§f" + stateStr),
+                                false
+                            );
+                            return 0;
+                        }
+
+                        ConfigHandler.replacementActive.set(state);
+                        ConfigHandler.cachedReplacementActive = state;
+                        ConfigHandler.replacementActive.save();
+
+                        if(mc != null && mc.player != null) mc.player.sendMessage(
+                            Text.literal("§6Set replacement mode state to: §l§f" + stateStr),
+                            false
+                        );
+                        return 1;
+                    })
+                )
             );
         });
     }
