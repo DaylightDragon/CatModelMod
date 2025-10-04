@@ -48,8 +48,6 @@ public abstract class EntityRenderDispatcherMixin {
             if (existingCat != null) {
 
                 PlayerToCatReplacer.syncEntity2(player, existingCat);
-//                existingCat.copyFrom(player);
-//                existingCat.setPos(player.getX(), player.getY() - 2, player.getZ());
 
                 matrices.push();
                 matrices.translate(x, y, z);

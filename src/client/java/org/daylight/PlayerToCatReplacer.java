@@ -20,6 +20,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.dimension.DimensionTypes;
 import org.daylight.mixin.client.CatEntityAccessor;
+import org.daylight.mixin.client.LimbAnimatorAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -256,5 +257,39 @@ public class PlayerToCatReplacer {
 
         existingCat.lastHeadYaw = player.lastHeadYaw;
         existingCat.headYaw = player.headYaw;
+
+//        double dx = player.getX() - player.lastX;
+//        double dz = player.getZ() - player.lastZ;
+//        float limbSpeed = (float)(dx * dx + dz * dz);
+//
+//        // vanilla: sqrt + *4
+//        limbSpeed = MathHelper.sqrt(limbSpeed) * 4.0f;
+//        if (limbSpeed > 1.0f) limbSpeed = 1.0f;
+
+        existingCat.limbAnimator.updateLimbs(
+                getPlayerMovementSpeed(player), // player.limbAnimator.getSpeed(),      // скорость движений ног игрока
+                0.9f,                                // скорость реакции (1.0f = мгновенно повторяет)
+                1.0f // existingCat.isBaby() ? 2.0f :
+        );
+
+        if(existingCat.limbAnimator instanceof LimbAnimatorAccessor limbAnimatorAccessor) {
+            limbAnimatorAccessor.setAnimationProgress(player.limbAnimator.getAnimationProgress());
+//            System.out.println(limbAnimatorAccessor.getAnimationProgress());
+        }
+
+//        existingCat.limbAnimator.animationProgress = player.limbAnimator.getAnimationProgress();
+    }
+
+    private static float getPlayerMovementSpeed(AbstractClientPlayerEntity player) {
+        // Вычисляем скорость движения игрока
+        double dx = player.getX() - player.lastX;
+        double dz = player.getZ() - player.lastZ;
+        double horizontalSpeed = Math.sqrt(dx * dx + dz * dz);
+
+        // Нормализуем скорость для анимаций
+        float speed = (float) horizontalSpeed * 20.0f;
+
+        // Ограничиваем максимальную скорость
+        return Math.min(speed, 1.0f);
     }
 }

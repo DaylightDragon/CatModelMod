@@ -5,7 +5,8 @@
 	"client": [
         "CatEntityAccessor",
         "EntityRenderDispatcherMixin",
-        "CatEntityMixin"
+        "CatEntityMixin",
+        "LimbAnimatorAccessor"
 	],
     "verbose": false,
 	"injectors": {
