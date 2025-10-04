@@ -41,11 +41,11 @@ dependencies {
 }
 
 processResources {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
-    from("src/main/resources") { // remove this and above when works
-        include "**/*.png"
-    }
+//    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+//
+//    from("src/main/resources") { // remove this and above when works
+//        include "**/*.png"
+//    }
 
 	inputs.property "version", project.version
 

@@ -28,12 +28,6 @@ public class CatModelModClient implements ClientModInitializer {
         ModResources.init();
         ConfigHandler.init();
 
-        ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
-            ModResources.postInit();
-            var res = client.getResourceManager().getResource(ModResources.CAT_HAND_TEXTURE);
-            System.out.println("Resource found at client start: " + res.isPresent());
-        });
-
 		ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register((handler, world) -> {
 			if (world != null) {
 				PlayerToCatReplacer.initWorld();
