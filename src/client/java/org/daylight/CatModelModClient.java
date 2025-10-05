@@ -9,6 +9,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.minecraft.client.MinecraftClient;
 import org.daylight.config.ConfigHandler;
+import org.daylight.util.CatSkinManager;
 import org.daylight.util.PlayerToCatReplacer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,10 +28,11 @@ public class CatModelModClient implements ClientModInitializer {
         ModCommands.register();
         ModResources.init();
         ConfigHandler.init();
+        CatSkinManager.init();
 
 		ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register((handler, world) -> {
 			if (world != null) {
-				PlayerToCatReplacer.initWorld();
+                PlayerToCatReplacer.initWorld();
                 checked.set(false);
 			}
 		});

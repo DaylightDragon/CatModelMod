@@ -9,6 +9,7 @@ public class ConfigHandler {
     public static final SimpleConfig CONFIG = new SimpleConfig();
 
     public static IStringConfigValue catVariant;
+    public static IBooleanConfigValue catVariantVanilla;
     public static IBooleanConfigValue replacementActive;
     public static IBooleanConfigValue catHandActive;
 
@@ -16,6 +17,7 @@ public class ConfigHandler {
         CONFIG.load();
 
         catVariant = new FabricStringConfigValue(CONFIG, "catVariant", "SIAMESE");
+        catVariantVanilla = new FabricBooleanConfigValue(CONFIG, "catVariantIsVanilla", true);
         replacementActive = new FabricBooleanConfigValue(CONFIG, "replacementActive", true);
         catHandActive = new FabricBooleanConfigValue(CONFIG, "catHandActive", true);
     }

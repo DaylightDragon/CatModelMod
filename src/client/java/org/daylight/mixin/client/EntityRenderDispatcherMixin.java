@@ -43,7 +43,6 @@ public abstract class EntityRenderDispatcherMixin {
     ) {
         if (ConfigHandler.replacementActive.getCached() && entity instanceof AbstractClientPlayerEntity player &&
                 PlayerToCatReplacer.shouldReplace(player)) {
-
             CatEntity existingCat = (CatEntity) PlayerToCatReplacer.getCatForPlayer(player);
 
             if (existingCat != null) {
@@ -56,7 +55,7 @@ public abstract class EntityRenderDispatcherMixin {
                     EntityRenderer<CatEntity, EntityRenderState> catRenderer = this.getRenderer(existingCat);
                     if(catRenderer instanceof CustomCatTextureHolder customCatTextureHolder) {
                         if(customCatTextureHolder.catModel$shouldUpdateCustomTexture()) {
-                            System.out.println("RenderDispatcher updates CatRenderer state");
+                            CatModelModClient.LOGGER.info("RenderDispatcher updates CatRenderer state");
                             catRenderer.getAndUpdateRenderState(existingCat, 0);
                         }
                     }

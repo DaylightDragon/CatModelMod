@@ -21,6 +21,7 @@ import net.minecraft.world.World;
 import org.daylight.CatModelModClient;
 import org.daylight.CustomCatTextureHolder;
 import org.daylight.config.ConfigHandler;
+import org.daylight.config.Data;
 import org.daylight.mixin.client.CatEntityAccessor;
 import org.daylight.mixin.client.LimbAnimatorAccessor;
 import org.slf4j.Logger;
@@ -28,7 +29,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -52,7 +52,7 @@ public class PlayerToCatReplacer {
         if (dummyModelMap.containsKey(player.getUuid())) return;
 
         CatEntity cat = new CatEntity(EntityType.CAT, targetWorld);
-        changeCatVariant(cat, CatVariantUtils.deserializeVariant(ConfigHandler.catVariant.get()));
+        if(ConfigHandler.catVariantVanilla.get()) changeCatVariant(cat, CatVariantUtils.deserializeVariant(ConfigHandler.catVariant.get()));
         cat.setTamed(true, false);
 //        cat.setOwner(player);
 
@@ -62,6 +62,8 @@ public class PlayerToCatReplacer {
         cat.setPosition(player.getX(), player.getY(), player.getZ());
 
         dummyModelMap.put(player.getUuid(), cat);
+
+        CatSkinManager.setupCustomSkin();
     }
 
     private static RegistryEntry<CatVariant> getCatVariant(RegistryKey<CatVariant> variantKey) {
@@ -175,6 +177,10 @@ public class PlayerToCatReplacer {
         LivingEntity catLivingEntity = getCatForPlayer(client.player);
         if(catLivingEntity instanceof CatEntity catEntity) {
             changeCatVariant(catEntity, variant);
+            if(catEntity instanceof CustomCatTextureHolder customCatTextureHolder) {
+                customCatTextureHolder.catModel$setCustomTexture(null);
+                customCatTextureHolder.catModel$requestCustomTextureUpdate();
+            }
         }
     }
 
@@ -186,10 +192,10 @@ public class PlayerToCatReplacer {
         return null;
     }
 
-    public static boolean setCustomCatTexture(PlayerEntity player, String skinName) {
+    public static boolean setCustomCatEntityTexture(PlayerEntity player, String skinName) {
         LivingEntity cat = getCatForPlayer(player);
         if(cat instanceof CatEntity catEntity) {
-            Identifier identifier = loadCustomTexture(skinName);
+            Identifier identifier = loadCustomTexture("cat_enitity_skins", skinName);
             if(!GraphicsUtils.doesTextureExist(identifier)) return false;
             if(catEntity instanceof CustomCatTextureHolder customCatTextureHolder) {
 //                System.out.println("Setting custom texture");
@@ -201,9 +207,19 @@ public class PlayerToCatReplacer {
         return false;
     }
 
-    public static Identifier loadCustomTexture(String skinName) {
+    public static boolean setCustomCatHandTexture(String skinName) {
+        Identifier identifier = loadCustomTexture("cat_hand_skins", skinName);
+        if(!GraphicsUtils.doesTextureExist(identifier)) {
+            Data.catHandTexture = null;
+            return false;
+        }
+        Data.catHandTexture = identifier;
+        return true;
+    }
+
+    public static Identifier loadCustomTexture(String subfolder, String skinName) {
         try {
-            String basePath = MinecraftClient.getInstance().runDirectory.getAbsolutePath() + "/data/cat_model_custom/cat_enitity_skins";
+            String basePath = MinecraftClient.getInstance().runDirectory.getAbsolutePath() + "/data/cat_model_custom/" + subfolder;
             File folder = new File(basePath);
             folder.mkdirs();
 //            System.out.println(Arrays.toString(folder.listFiles()));
@@ -213,7 +229,7 @@ public class PlayerToCatReplacer {
             }
 
             NativeImage image = NativeImage.read(new FileInputStream(file));
-            Supplier<String> nameSupplier = () -> "custom_cat_entity_skins/" + skinName;
+            Supplier<String> nameSupplier = () -> subfolder + "/" + skinName;
             NativeImageBackedTexture texture = new NativeImageBackedTexture(nameSupplier, image);
 
             Identifier id = Identifier.of("catmodel", nameSupplier.get());

@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class SimpleConfig {
     private static final Gson GSON = new Gson();
-    private static final File FILE = new File("config/numismaticscalculator.json");
+    private static final File FILE = new File("config/catmodelconfig.json");
     private Map<String, Object> data = new HashMap<>();
 
     public void load() {

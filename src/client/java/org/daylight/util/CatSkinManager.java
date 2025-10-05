@@ -1,0 +1,77 @@
+package org.daylight.util;
+
+import net.minecraft.client.MinecraftClient;
+import org.daylight.config.ConfigHandler;
+
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+public class CatSkinManager {
+    private static final List<String> STATIC_VARIANTS  = List.of(
+            "tabby", "black", "red", "siamese",
+            "british_shorthair", "calico", "persian",
+            "ragdoll", "white", "jellie", "all_black"
+    );
+    public static final CopyOnWriteArrayList<String> DYNAMIC_VARIANTS = new CopyOnWriteArrayList<>();
+    public static final CopyOnWriteArrayList<String> ALL_VARIANTS = new CopyOnWriteArrayList<>();
+
+    public static void startWatcher() {
+        String basePath = MinecraftClient.getInstance().runDirectory.getAbsolutePath() + "/data/cat_model_custom/cat_enitity_skins";
+        Path dir = Paths.get(basePath);
+
+        // Mkdirs
+        dir.toFile().mkdirs();
+        new File(MinecraftClient.getInstance().runDirectory.getAbsolutePath() + "/data/cat_model_custom/cat_hand_skins").mkdirs();
+
+        Thread watcherThread = new Thread(new CustomSkinWatcher(dir, DYNAMIC_VARIANTS) {
+            @Override
+            public void updateAllVariants() {
+                CatSkinManager.updateAllVariants();
+            }
+        }, "CatEntitySkinWatcher");
+        watcherThread.setDaemon(true);
+        watcherThread.start();
+    }
+
+    public static void updateAllVariants() {
+        ALL_VARIANTS.clear();
+        ALL_VARIANTS.addAll(STATIC_VARIANTS);
+        for(String variant : DYNAMIC_VARIANTS) {
+            String variantFinal = variant;
+            if(ALL_VARIANTS.contains(variantFinal)) variantFinal = "custom_" +  variantFinal;
+            if(!ALL_VARIANTS.contains(variantFinal)) ALL_VARIANTS.add(variantFinal);
+        }
+    }
+
+    public static boolean isVanillaVariant(String variant) {
+        return STATIC_VARIANTS.contains(variant);
+    }
+
+    public static String getActualCustomFileName(String variant) {
+        if(DYNAMIC_VARIANTS.contains(variant)) return variant;
+        while(variant.startsWith("custom_")) {
+            String newStr = variant.substring("custom_".length());
+            if(DYNAMIC_VARIANTS.contains(newStr)) return newStr;
+            variant = newStr;
+        }
+        return null;
+    }
+
+    public static void init() {
+        startWatcher();
+    }
+
+    public static void setupCustomSkin() {
+        if(!ConfigHandler.catVariantVanilla.get()) {
+            if(!PlayerToCatReplacer.setCustomCatEntityTexture(MinecraftClient.getInstance().player, ConfigHandler.catVariant.get())) {
+                ConfigHandler.catVariant.set("SIAMESE");
+                ConfigHandler.catVariantVanilla.set(true);
+            } else {
+                PlayerToCatReplacer.setCustomCatHandTexture(ConfigHandler.catVariant.get());
+            }
+        }
+    }
+}

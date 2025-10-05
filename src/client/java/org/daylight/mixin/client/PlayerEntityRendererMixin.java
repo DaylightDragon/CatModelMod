@@ -12,6 +12,7 @@ import net.minecraft.resource.Resource;
 import net.minecraft.util.Identifier;
 import org.daylight.ModResources;
 import org.daylight.config.ConfigHandler;
+import org.daylight.config.Data;
 import org.daylight.util.CatVariantUtils;
 import org.daylight.util.PlayerToCatReplacer;
 import org.spongepowered.asm.mixin.Mixin;
@@ -33,7 +34,7 @@ public abstract class PlayerEntityRendererMixin {
 //                MinecraftClient.getInstance().getTextureManager().registerTexture(ModResources.CAT_HAND_TEXTURE, new ResourceTexture(ModResources.CAT_HAND_TEXTURE));
 //            }
 //            return ModResources.CAT_HAND_TEXTURE; // твой кастомный текстурный идентификатор
-            return getHandTexture();
+            return getHandTexture(skinTexture);
         }
         return skinTexture;
     }
@@ -46,13 +47,17 @@ public abstract class PlayerEntityRendererMixin {
         if (ConfigHandler.catHandActive.getCached() && ConfigHandler.replacementActive.getCached()
                 && PlayerToCatReplacer.shouldReplace(getPlayer())) {
 //            return ModResources.CAT_HAND_TEXTURE;
-            return getHandTexture();
+            return getHandTexture(skinTexture);
         }
         return skinTexture;
     }
 
     @Unique
-    private Identifier getHandTexture() {
+    private Identifier getHandTexture(Identifier defaultValue) {
+        if(!ConfigHandler.catVariantVanilla.getCached()) {
+            if(Data.catHandTexture != null) return Data.catHandTexture;
+            else return defaultValue;
+        }
         return ModResources.CAT_HAND_BY_VARIANT.get(CatVariantUtils.deserializeVariant(ConfigHandler.catVariant.getCached()));
     }
 

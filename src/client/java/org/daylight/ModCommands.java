@@ -4,28 +4,20 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.entity.passive.CatVariant;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import org.daylight.config.ConfigHandler;
+import org.daylight.config.Data;
+import org.daylight.util.CatSkinManager;
 import org.daylight.util.CatVariantUtils;
 import org.daylight.util.PlayerToCatReplacer;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.List;
 import java.util.Locale;
-import java.util.function.Supplier;
 
 public class ModCommands {
-    private static final List<String> VARIANTS = List.of(
-            "tabby", "black", "red", "siamese",
-            "british_shorthair", "calico", "persian",
-            "ragdoll", "white", "jellie", "all_black"
-    );
+
 
     private static final List<String> MODES_OF_OFF = List.of(
             "on", "off"
@@ -38,7 +30,7 @@ public class ModCommands {
                             .suggests((context, builder) -> {
                                 String input = builder.getRemaining().toLowerCase(Locale.ROOT);
 
-                                for (String v : VARIANTS) {
+                                for (String v : CatSkinManager.ALL_VARIANTS) {
                                     if (v.toLowerCase(Locale.ROOT).startsWith(input)) {
                                         builder.suggest(v);
                                     }
@@ -53,19 +45,55 @@ public class ModCommands {
                                 String variantName = StringArgumentType.getString(context, "variant");
 
                                 try {
-                                    RegistryKey<CatVariant> variant = CatVariantUtils.deserializeVariant(variantName);
-                                    String name = CatVariantUtils.serializeVariant(variant);
-//                                    PlayerCatData.setCatVariant(client.player.getUuid(), variant);
+                                    if(CatSkinManager.isVanillaVariant(variantName)) {
+                                        RegistryKey<CatVariant> variant = CatVariantUtils.deserializeVariant(variantName);
+                                        String name = CatVariantUtils.serializeVariant(variant);
+//                                      PlayerCatData.setCatVariant(client.player.getUuid(), variant);
 
-                                    ConfigHandler.catVariant.set(name);
-                                    PlayerToCatReplacer.setLocalCatVariant(variant);
-                                    ConfigHandler.catVariant.save();
+                                        ConfigHandler.catVariant.set(name);
+                                        ConfigHandler.catVariantVanilla.set(true);
+                                        PlayerToCatReplacer.setLocalCatVariant(variant);
+                                        ConfigHandler.CONFIG.save();
 
-                                    client.player.sendMessage(
-                                            Text.literal("§6Set variant: §l§f" + name.toLowerCase(Locale.ROOT)),
-                                            false
-                                    );
-                                    return 1;
+                                        client.player.sendMessage(
+                                                Text.literal("§6Set variant: §l§f" + name.toLowerCase(Locale.ROOT)),
+                                                false
+                                        );
+                                        return 1;
+                                    } else if(CatSkinManager.getActualCustomFileName(variantName) != null) {
+                                        MinecraftClient mc = MinecraftClient.getInstance();
+                                        String finalVariantName = CatSkinManager.getActualCustomFileName(variantName);
+
+                                        ConfigHandler.catVariant.set(finalVariantName);
+                                        ConfigHandler.catVariantVanilla.set(false);
+                                        ConfigHandler.CONFIG.save();
+
+                                        if(PlayerToCatReplacer.setCustomCatEntityTexture(MinecraftClient.getInstance().player, finalVariantName)) {
+                                            if(mc.player != null) mc.player.sendMessage(
+                                                    Text.literal("§6Set variant: §l§f" + variantName),
+                                                    false
+                                            );
+                                            if(!PlayerToCatReplacer.setCustomCatHandTexture(finalVariantName) && ConfigHandler.catHandActive.get()) {
+                                                if(mc.player != null) mc.player.sendMessage(
+                                                        Text.literal("§eWarning: Couldn't find a texture for custom hand §l§f" + variantName),
+                                                        false
+                                                );
+                                            }
+                                            return 1;
+                                        } else {
+                                            if(mc.player != null) mc.player.sendMessage(
+                                                    Text.literal("§cCouldn't find §l§f" + variantName + ".png §r§c in §l§f/data/cat_model_custom/cat_enitity_skins"),
+                                                    false
+                                            );
+                                            return 0;
+                                        }
+                                    } else {
+                                        client.player.sendMessage(
+                                                Text.literal("§cUnknown variant: §l§f" + ConfigHandler.catVariant.get()),
+                                                false
+                                        );
+                                        return 0;
+                                    }
                                 } catch (Exception e) {
                                     client.player.sendMessage(
                                             Text.literal("§cUnknown variant: §l§f" + ConfigHandler.catVariant.get()),
@@ -128,6 +156,12 @@ public class ModCommands {
                                 boolean state;
                                 if(stateStr.equals("on")) {
                                     state = true;
+                                    if(Data.catHandTexture == null && !ConfigHandler.catVariantVanilla.get()) {
+                                        if(mc.player != null) mc.player.sendMessage(
+                                                Text.literal("§eWarning: Couldn't find a texture for the custom hand"),
+                                                false
+                                        );
+                                    }
                                 } else if(stateStr.equals("off")) {
                                     state = false;
                                 } else {
@@ -149,7 +183,7 @@ public class ModCommands {
                         MinecraftClient mc = MinecraftClient.getInstance();
                         String variantName = StringArgumentType.getString(context, "variant");
 
-                        if(PlayerToCatReplacer.setCustomCatTexture(MinecraftClient.getInstance().player, variantName)) {
+                        if(PlayerToCatReplacer.setCustomCatEntityTexture(MinecraftClient.getInstance().player, variantName)) {
                             if(mc.player != null) mc.player.sendMessage(
                                     Text.literal("§cSet variant: §l§f" + variantName),
                                     false
