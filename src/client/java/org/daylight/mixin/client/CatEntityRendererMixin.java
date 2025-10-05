@@ -1,0 +1,39 @@
+package org.daylight.mixin.client;
+
+import net.minecraft.client.render.entity.CatEntityRenderer;
+import net.minecraft.client.render.entity.state.CatEntityRenderState;
+import net.minecraft.entity.passive.CatEntity;
+import net.minecraft.util.Identifier;
+import org.daylight.CatModelModClient;
+import org.daylight.CustomCatTextureHolder;
+import org.daylight.util.PlayerToCatReplacer;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+@Mixin(CatEntityRenderer.class)
+public abstract class CatEntityRendererMixin {
+    @Inject(
+            method = "updateRenderState(Lnet/minecraft/entity/passive/CatEntity;Lnet/minecraft/client/render/entity/state/CatEntityRenderState;F)V",
+            at = @At("TAIL")
+    )
+    private void onUpdateRenderState(CatEntity cat, CatEntityRenderState state, float tickDelta, CallbackInfo ci) {
+        if (isCustomCat(cat)) {
+            Identifier customTexture = getCatEntityCustomTexture(cat);
+            if(customTexture == null) return;
+            state.texture = customTexture;
+        }
+    }
+
+    private boolean isCustomCat(CatEntity cat) {
+        return PlayerToCatReplacer.isDummyCat(cat);
+    }
+
+    private Identifier getCatEntityCustomTexture(CatEntity cat) {
+        if(cat instanceof CustomCatTextureHolder customCatTextureHolder) {
+            return customCatTextureHolder.catModel$getCustomTexture();
+        }
+        return null;
+    }
+}

@@ -14,6 +14,7 @@ import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.RegistryKeys;
 import org.daylight.CatModelModClient;
+import org.daylight.CustomCatTextureHolder;
 import org.daylight.config.ConfigHandler;
 import org.daylight.util.CatVariantUtils;
 import org.daylight.util.PlayerToCatReplacer;
@@ -53,6 +54,12 @@ public abstract class EntityRenderDispatcherMixin {
 
                 try {
                     EntityRenderer<CatEntity, EntityRenderState> catRenderer = this.getRenderer(existingCat);
+                    if(catRenderer instanceof CustomCatTextureHolder customCatTextureHolder) {
+                        if(customCatTextureHolder.catModel$shouldUpdateCustomTexture()) {
+                            System.out.println("RenderDispatcher updates CatRenderer state");
+                            catRenderer.getAndUpdateRenderState(existingCat, 0);
+                        }
+                    }
                     ci.cancel();
 
                     var catState = catRenderer.getAndUpdateRenderState(existingCat, tickDelta);

@@ -16,8 +16,6 @@ import java.io.InputStream;
 import java.util.Map;
 
 public class ModResources {
-    public static final Identifier CAT_HAND_TEXTURE = Identifier.of(CatModelMod.MOD_ID, "textures/entity/cat_hand0.png");
-
     public static final Identifier ALL_BLACK_HAND_TEXTURE   = Identifier.of(CatModelMod.MOD_ID, "textures/entity/all_black_hand.png");
     public static final Identifier BLACK_HAND_TEXTURE       = Identifier.of(CatModelMod.MOD_ID, "textures/entity/black_hand.png");
     public static final Identifier BRITISH_SHORTHAIR_HAND_TEXTURE = Identifier.of(CatModelMod.MOD_ID, "textures/entity/british_shorthair_hand.png");

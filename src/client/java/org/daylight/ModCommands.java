@@ -4,15 +4,21 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.texture.NativeImage;
+import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.entity.passive.CatVariant;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import org.daylight.config.ConfigHandler;
 import org.daylight.util.CatVariantUtils;
 import org.daylight.util.PlayerToCatReplacer;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Supplier;
 
 public class ModCommands {
     private static final List<String> VARIANTS = List.of(
@@ -30,11 +36,14 @@ public class ModCommands {
             dispatcher.register(ClientCommandManager.literal("catvariant")
                     .then(ClientCommandManager.argument("variant", StringArgumentType.word())
                             .suggests((context, builder) -> {
+                                String input = builder.getRemaining().toLowerCase(Locale.ROOT);
+
                                 for (String v : VARIANTS) {
-                                    if (v.startsWith(builder.getRemaining().toUpperCase(Locale.ROOT))) {
+                                    if (v.toLowerCase(Locale.ROOT).startsWith(input)) {
                                         builder.suggest(v);
                                     }
                                 }
+
                                 return builder.buildFuture();
                             })
                             .executes(context -> {
@@ -132,6 +141,29 @@ public class ModCommands {
                                 return performSetCatHandActive(state);
                             })
                     )
+            );
+
+            dispatcher.register(ClientCommandManager.literal("catcustom")
+                    .then(ClientCommandManager.argument("variant", StringArgumentType.word())
+                    .executes(context -> {
+                        MinecraftClient mc = MinecraftClient.getInstance();
+                        String variantName = StringArgumentType.getString(context, "variant");
+
+                        if(PlayerToCatReplacer.setCustomCatTexture(MinecraftClient.getInstance().player, variantName)) {
+                            if(mc.player != null) mc.player.sendMessage(
+                                    Text.literal("§cSet variant: §l§f" + variantName),
+                                    false
+                            );
+                            return 1;
+                        } else {
+                            if(mc.player != null) mc.player.sendMessage(
+                                    Text.literal("§cCouldn't find §l§f" + variantName + ".png §r§c in §l§f/data/cat_model_custom/cat_enitity_skins"),
+                                    false
+                            );
+                            return 0;
+                        }
+                    })
+                )
             );
         });
     }

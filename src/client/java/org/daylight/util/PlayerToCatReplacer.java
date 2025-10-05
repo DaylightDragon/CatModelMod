@@ -4,26 +4,35 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
+import net.minecraft.client.texture.NativeImage;
+import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.entity.passive.CatVariant;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.daylight.CatModelModClient;
+import org.daylight.CustomCatTextureHolder;
 import org.daylight.config.ConfigHandler;
 import org.daylight.mixin.client.CatEntityAccessor;
 import org.daylight.mixin.client.LimbAnimatorAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
 public class PlayerToCatReplacer {
@@ -82,12 +91,12 @@ public class PlayerToCatReplacer {
         dummyModelMap.clear();
     }
 
-    public static boolean shouldReplace(AbstractClientPlayerEntity player) {
+    public static boolean shouldReplace(PlayerEntity player) {
         return dummyModelMap.containsKey(player.getUuid()) &&
                 player == MinecraftClient.getInstance().player;
     }
 
-    public static LivingEntity getCatForPlayer(AbstractClientPlayerEntity player) {
+    public static LivingEntity getCatForPlayer(PlayerEntity player) {
         return dummyModelMap.get(player.getUuid());
     }
 
@@ -166,6 +175,53 @@ public class PlayerToCatReplacer {
         LivingEntity catLivingEntity = getCatForPlayer(client.player);
         if(catLivingEntity instanceof CatEntity catEntity) {
             changeCatVariant(catEntity, variant);
+        }
+    }
+
+    public static Identifier getCustomCatTexture(PlayerEntity player) {
+        LivingEntity cat = getCatForPlayer(player);
+        if(cat instanceof CustomCatTextureHolder customCatTextureHolder) {
+            return customCatTextureHolder.catModel$getCustomTexture();
+        }
+        return null;
+    }
+
+    public static boolean setCustomCatTexture(PlayerEntity player, String skinName) {
+        LivingEntity cat = getCatForPlayer(player);
+        if(cat instanceof CatEntity catEntity) {
+            Identifier identifier = loadCustomTexture(skinName);
+            if(!GraphicsUtils.doesTextureExist(identifier)) return false;
+            if(catEntity instanceof CustomCatTextureHolder customCatTextureHolder) {
+//                System.out.println("Setting custom texture");
+                customCatTextureHolder.catModel$setCustomTexture(identifier);
+                customCatTextureHolder.catModel$requestCustomTextureUpdate();
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public static Identifier loadCustomTexture(String skinName) {
+        try {
+            String basePath = MinecraftClient.getInstance().runDirectory.getAbsolutePath() + "/data/cat_model_custom/cat_enitity_skins";
+            File folder = new File(basePath);
+            folder.mkdirs();
+//            System.out.println(Arrays.toString(folder.listFiles()));
+            File file = new File(folder, skinName + ".png");
+            if (!file.exists()) {
+                return null;
+            }
+
+            NativeImage image = NativeImage.read(new FileInputStream(file));
+            Supplier<String> nameSupplier = () -> "custom_cat_entity_skins/" + skinName;
+            NativeImageBackedTexture texture = new NativeImageBackedTexture(nameSupplier, image);
+
+            Identifier id = Identifier.of("catmodel", nameSupplier.get());
+            MinecraftClient.getInstance().getTextureManager().registerTexture(id, texture);
+            return id;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }
