@@ -40,7 +40,7 @@ public abstract class EntityRenderDispatcherMixin {
             int light,
             CallbackInfo ci
     ) {
-        if (ConfigHandler.cachedReplacementActive && entity instanceof AbstractClientPlayerEntity player &&
+        if (ConfigHandler.replacementActive.getCached() && entity instanceof AbstractClientPlayerEntity player &&
                 PlayerToCatReplacer.shouldReplace(player)) {
 
             CatEntity existingCat = (CatEntity) PlayerToCatReplacer.getCatForPlayer(player);

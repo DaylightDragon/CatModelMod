@@ -10,15 +10,13 @@ public class ConfigHandler {
 
     public static IStringConfigValue catVariant;
     public static IBooleanConfigValue replacementActive;
-
-    public static boolean cachedReplacementActive = true;
+    public static IBooleanConfigValue catHandActive;
 
     public static void init() {
         CONFIG.load();
 
         catVariant = new FabricStringConfigValue(CONFIG, "catVariant", "SIAMESE");
         replacementActive = new FabricBooleanConfigValue(CONFIG, "replacementActive", true);
-
-        cachedReplacementActive = replacementActive.get();
+        catHandActive = new FabricBooleanConfigValue(CONFIG, "catHandActive", true);
     }
 }

@@ -7,6 +7,12 @@ public class FabricConfigValue<T> implements IConfigValue<T> {
     private final SimpleConfig config;
     private final String key;
     private final T defaultValue;
+    private T cachedValue = null;
+
+    public T getCached() {
+        if(cachedValue == null) cachedValue = get();
+        return cachedValue;
+    }
 
     public FabricConfigValue(SimpleConfig config, String key, T defaultValue) {
         this.config = config;
@@ -23,21 +29,26 @@ public class FabricConfigValue<T> implements IConfigValue<T> {
         }
 
         if (defaultValue instanceof Integer && raw instanceof Number num) {
-            return (T) Integer.valueOf(num.intValue());
+            cachedValue = (T) Integer.valueOf(num.intValue());
+            return cachedValue;
         }
         if (defaultValue instanceof Boolean && raw instanceof Boolean b) {
-            return (T) b;
+            cachedValue = (T) b;
+            return cachedValue;
         }
         if (defaultValue instanceof Double && raw instanceof Number num) {
-            return (T) Double.valueOf(num.doubleValue());
+            cachedValue = (T) Double.valueOf(num.doubleValue());
+            return cachedValue;
         }
         if (defaultValue instanceof String && !(raw instanceof String)) {
-            return (T) raw.toString();
+            cachedValue = (T) raw.toString();
+            return cachedValue;
         }
 
         // fallback
         try {
-            return (T) raw;
+            cachedValue = (T) raw;
+            return cachedValue;
         } catch (ClassCastException e) {
             return defaultValue;
         }
@@ -46,6 +57,7 @@ public class FabricConfigValue<T> implements IConfigValue<T> {
     @Override
     public void set(T value) {
         config.set(key, value);
+        cachedValue = value;
     }
 
     @Override

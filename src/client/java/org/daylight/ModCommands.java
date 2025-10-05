@@ -59,7 +59,7 @@ public class ModCommands {
                                     return 1;
                                 } catch (Exception e) {
                                     client.player.sendMessage(
-                                            Text.literal("§cUnknown variant: §l§f" + variantName),
+                                            Text.literal("§cUnknown variant: §l§f" + ConfigHandler.catVariant.get()),
                                             false
                                     );
                                     return 0;
@@ -68,7 +68,8 @@ public class ModCommands {
                     )
             );
 
-            dispatcher.register(ClientCommandManager.literal("catactive")
+            dispatcher.register(ClientCommandManager.literal("catmode")
+                .executes(context -> performSetCatActive(!ConfigHandler.replacementActive.get()))
                 .then(ClientCommandManager.argument("state", StringArgumentType.word())
                     .suggests((context, builder) -> {
                         for (String v : MODES_OF_OFF) {
@@ -82,12 +83,12 @@ public class ModCommands {
                         MinecraftClient mc = MinecraftClient.getInstance();
                         String stateStr = StringArgumentType.getString(context, "state");
 
-                        boolean state = true;
+                        boolean state;
                         if(stateStr.equals("on")) {
                             state = true;
                         } else if(stateStr.equals("off")) {
                             state = false;
-                        }  else {
+                        } else {
                             if(mc != null && mc.player != null) mc.player.sendMessage(
                                 Text.literal("§cUnexpected value: §l§f" + stateStr),
                                 false
@@ -95,18 +96,71 @@ public class ModCommands {
                             return 0;
                         }
 
-                        ConfigHandler.replacementActive.set(state);
-                        ConfigHandler.cachedReplacementActive = state;
-                        ConfigHandler.replacementActive.save();
-
-                        if(mc != null && mc.player != null) mc.player.sendMessage(
-                            Text.literal("§6Set replacement mode state to: §l§f" + stateStr),
-                            false
-                        );
-                        return 1;
+                        return performSetCatActive(state);
                     })
                 )
             );
+
+            dispatcher.register(ClientCommandManager.literal("cathand")
+                    .executes(context -> performSetCatHandActive(!ConfigHandler.replacementActive.get()))
+                    .then(ClientCommandManager.argument("state", StringArgumentType.word())
+                            .suggests((context, builder) -> {
+                                for (String v : MODES_OF_OFF) {
+                                    if (v.startsWith(builder.getRemaining().toUpperCase(Locale.ROOT))) {
+                                        builder.suggest(v);
+                                    }
+                                }
+                                return builder.buildFuture();
+                            })
+                            .executes(context -> {
+                                MinecraftClient mc = MinecraftClient.getInstance();
+                                String stateStr = StringArgumentType.getString(context, "state");
+
+                                boolean state;
+                                if(stateStr.equals("on")) {
+                                    state = true;
+                                } else if(stateStr.equals("off")) {
+                                    state = false;
+                                } else {
+                                    if(mc != null && mc.player != null) mc.player.sendMessage(
+                                            Text.literal("§cUnexpected value: §l§f" + stateStr),
+                                            false
+                                    );
+                                    return 0;
+                                }
+
+                                return performSetCatHandActive(state);
+                            })
+                    )
+            );
         });
+    }
+
+    private static int performSetCatActive(boolean state) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+
+        ConfigHandler.replacementActive.set(state);
+        ConfigHandler.replacementActive.save();
+
+        if(mc != null && mc.player != null) mc.player.sendMessage(
+                Text.literal("§6Set cat mode to: §l§f" +
+                        (ConfigHandler.replacementActive.get() ? "Active" : "Disabled")),
+                false
+        );
+        return 1;
+    }
+
+    private static int performSetCatHandActive(boolean state) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+
+        ConfigHandler.catHandActive.set(state);
+        ConfigHandler.catHandActive.save();
+
+        if(mc != null && mc.player != null) mc.player.sendMessage(
+                Text.literal("§6Now the cat hand mode is: §l§f" +
+                                (ConfigHandler.catHandActive.get() ? "Active" : "Disabled")),
+                false
+        );
+        return 1;
     }
 }
