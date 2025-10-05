@@ -1,7 +1,7 @@
 package org.daylight;
 
 public enum InvisibilityBehaviour {
-    IGNORE,
-    INVISIBLE,
+    NEVER,
+    USUAL,
     CHARGED
 }

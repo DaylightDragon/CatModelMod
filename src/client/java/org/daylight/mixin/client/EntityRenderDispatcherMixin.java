@@ -1,34 +1,25 @@
 package org.daylight.mixin.client;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.feature.FeatureRenderer;
 import net.minecraft.client.render.entity.state.EntityHitboxAndView;
 import net.minecraft.client.render.entity.state.EntityRenderState;
 import net.minecraft.client.render.entity.state.LivingEntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.passive.CatEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.math.RotationAxis;
 import org.daylight.*;
 import org.daylight.config.ConfigHandler;
-import org.daylight.config.Data;
 import org.daylight.features.CatChargeFeatureRenderer;
-import org.daylight.util.CatVariantUtils;
 import org.daylight.util.PlayerToCatReplacer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.function.Predicate;
 
 @Mixin(EntityRenderDispatcher.class)
 public abstract class EntityRenderDispatcherMixin {
@@ -69,11 +60,15 @@ public abstract class EntityRenderDispatcherMixin {
 
                     var catState = catRenderer.getAndUpdateRenderState(existingCat, tickDelta);
 //                    if(catState instanceof CustomCatState customCatState) customCatState.catmodel$setChargeActive(false);
+                    CatChargeFeatureRenderer.getChargeData(existingCat).chargeActive = false;
 
-                    if(!(player.isInvisible() && ConfigHandler.invisibilityBehaviour != InvisibilityBehaviour.IGNORE)) {
+                    boolean visible = !player.isInvisible();
+                    InvisibilityBehaviour behaviour = (InvisibilityBehaviour) ConfigHandler.invisibilityBehaviour.getCached();
+
+                    if((visible || behaviour == InvisibilityBehaviour.NEVER)) {
                         // Just cat
                         catRenderer.render(catState, matrices, vertexConsumers, light);
-                    } else {
+                    } else if(!visible && behaviour == InvisibilityBehaviour.CHARGED) {
                         // Charge
                         if(catRenderer instanceof IFeatureManager featureManager) {
                             matrices.push();
@@ -99,7 +94,7 @@ public abstract class EntityRenderDispatcherMixin {
                         }
                     }
 
-                    Data.shouldRenderCharge = player.isInvisible() && ConfigHandler.invisibilityBehaviour == InvisibilityBehaviour.CHARGED;
+//                    Data.shouldRenderCharge = player.isInvisible() && ConfigHandler.invisibilityBehaviour == InvisibilityBehaviour.CHARGED;
 
                     if (shouldRenderHitboxes()) {
                         var playerState = getRenderer(player).getAndUpdateRenderState(player, tickDelta);
