@@ -66,6 +66,5 @@ public class CatModelModClient implements ClientModInitializer {
 //				PlayerToCatReplacer.syncEntities();
 //			}
 //		});
-
 	}
 }

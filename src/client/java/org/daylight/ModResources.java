@@ -41,6 +41,7 @@ public class ModResources {
             Map.entry(CatVariants.TABBY, TABBY_HAND_TEXTURE),
             Map.entry(CatVariants.WHITE, WHITE_HAND_TEXTURE)
     );
+    public static final Identifier GHOST_TEXTURE = Identifier.of(CatModelMod.MOD_ID, "textures/entity/cat_charge.png");;
 
     public static void init() {
     }

@@ -8,7 +8,8 @@
         "CatEntityMixin",
         "LimbAnimatorAccessor",
         "PlayerEntityRendererMixin",
-        "CatEntityRendererMixin"
+        "CatEntityRendererMixin",
+        "LivingEntityRendererMixin"
 	],
     "verbose": false,
 	"injectors": {

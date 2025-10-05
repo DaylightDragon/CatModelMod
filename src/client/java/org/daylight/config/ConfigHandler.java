@@ -1,5 +1,6 @@
 package org.daylight.config;
 
+import org.daylight.InvisibilityBehaviour;
 import org.daylight.replacements.FabricBooleanConfigValue;
 import org.daylight.replacements.FabricStringConfigValue;
 import org.daylight.replacements.common.IBooleanConfigValue;
@@ -12,6 +13,7 @@ public class ConfigHandler {
     public static IBooleanConfigValue catVariantVanilla;
     public static IBooleanConfigValue replacementActive;
     public static IBooleanConfigValue catHandActive;
+    public static InvisibilityBehaviour invisibilityBehaviour = InvisibilityBehaviour.CHARGED;
 
     public static void init() {
         CONFIG.load();

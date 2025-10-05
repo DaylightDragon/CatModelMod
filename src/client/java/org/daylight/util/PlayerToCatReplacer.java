@@ -53,7 +53,7 @@ public class PlayerToCatReplacer {
 
         CatEntity cat = new CatEntity(EntityType.CAT, targetWorld);
         if(ConfigHandler.catVariantVanilla.get()) changeCatVariant(cat, CatVariantUtils.deserializeVariant(ConfigHandler.catVariant.get()));
-        cat.setTamed(true, false);
+        cat.setTamed(false, false);
 //        cat.setOwner(player);
 
         cat.setNoGravity(true);

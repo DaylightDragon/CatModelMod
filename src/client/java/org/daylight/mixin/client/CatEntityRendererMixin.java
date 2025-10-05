@@ -1,11 +1,17 @@
 package org.daylight.mixin.client;
 
 import net.minecraft.client.render.entity.CatEntityRenderer;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.render.entity.LivingEntityRenderer;
+import net.minecraft.client.render.entity.feature.FeatureRendererContext;
+import net.minecraft.client.render.entity.model.CatEntityModel;
 import net.minecraft.client.render.entity.state.CatEntityRenderState;
 import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.util.Identifier;
-import org.daylight.CatModelModClient;
 import org.daylight.CustomCatTextureHolder;
+import org.daylight.IFeatureManager;
+import org.daylight.ModResources;
+import org.daylight.features.CatChargeFeatureRenderer;
 import org.daylight.util.PlayerToCatReplacer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -14,6 +20,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(CatEntityRenderer.class)
 public abstract class CatEntityRendererMixin {
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void onInit(EntityRendererFactory.Context context, CallbackInfo ci) {
+        var feature = new CatChargeFeatureRenderer((FeatureRendererContext<CatEntityRenderState, CatEntityModel>) this, context.getEntityModels(), ModResources.GHOST_TEXTURE);
+        if((Object) this instanceof IFeatureManager featureManager) {
+            featureManager.catmodel$addFeature(feature);
+        }
+    }
+
     @Inject(
             method = "updateRenderState(Lnet/minecraft/entity/passive/CatEntity;Lnet/minecraft/client/render/entity/state/CatEntityRenderState;F)V",
             at = @At("TAIL")
