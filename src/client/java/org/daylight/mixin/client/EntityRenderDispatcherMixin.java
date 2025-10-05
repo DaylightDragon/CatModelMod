@@ -16,10 +16,7 @@ import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.math.RotationAxis;
-import org.daylight.CatModelModClient;
-import org.daylight.CustomCatTextureHolder;
-import org.daylight.IFeatureManager;
-import org.daylight.InvisibilityBehaviour;
+import org.daylight.*;
 import org.daylight.config.ConfigHandler;
 import org.daylight.config.Data;
 import org.daylight.features.CatChargeFeatureRenderer;
@@ -71,17 +68,30 @@ public abstract class EntityRenderDispatcherMixin {
                     ci.cancel();
 
                     var catState = catRenderer.getAndUpdateRenderState(existingCat, tickDelta);
+//                    if(catState instanceof CustomCatState customCatState) customCatState.catmodel$setChargeActive(false);
+
                     if(!(player.isInvisible() && ConfigHandler.invisibilityBehaviour != InvisibilityBehaviour.IGNORE)) {
+                        // Just cat
                         catRenderer.render(catState, matrices, vertexConsumers, light);
                     } else {
+                        // Charge
                         if(catRenderer instanceof IFeatureManager featureManager) {
                             matrices.push();
+
+                            if(catState instanceof CustomCatState customCatState) {
+//                                customCatState.catmodel$setChargeActive(true);
+//                                customCatState.catmodel$setCustomTimeDelta(tickDelta);
+//                                customCatState.catmodel$setAsMainSpecialCat(true);
+                            }
 
                             // применяем такие же повороты, как в LivingEntityRenderer
                             float bodyYaw = ((LivingEntityRenderState) catState).bodyYaw; // или entity.getBodyYaw(tickDelta)
                             matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0F - bodyYaw));
                             matrices.scale(-1.0F, -1.0F, 1.0F);
                             matrices.translate(0.0f, -1.501f, 0.0f);
+//                            System.out.println("Tickdelta: " + tickDelta);
+
+                            CatChargeFeatureRenderer.getChargeData(existingCat).chargeActive = true;
 
                             featureManager.renderAllFeatures((LivingEntityRenderState) catState, matrices, vertexConsumers, light, featureRenderer -> featureRenderer instanceof CatChargeFeatureRenderer);
 

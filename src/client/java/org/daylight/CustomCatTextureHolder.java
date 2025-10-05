@@ -7,4 +7,8 @@ public interface CustomCatTextureHolder {
     void catModel$setCustomTexture(Identifier texture);
     boolean catModel$shouldUpdateCustomTexture();
     void catModel$requestCustomTextureUpdate();
+
+//    float catmodel$getChargeProgress();
+//
+//    void catmodel$setChargeProgress(float value);
 }

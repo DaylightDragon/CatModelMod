@@ -1,18 +1,23 @@
 {
-	"required": true,
-	"package": "org.daylight.mixin.client",
-	"compatibilityLevel": "JAVA_21",
-	"client": [
-        "CatEntityAccessor",
-        "EntityRenderDispatcherMixin",
-        "CatEntityMixin",
-        "LimbAnimatorAccessor",
-        "PlayerEntityRendererMixin",
-        "CatEntityRendererMixin",
-        "LivingEntityRendererMixin"
-	],
-    "verbose": false,
-	"injectors": {
-		"defaultRequire": 1
-	}
+  "required": true,
+  "package": "org.daylight.mixin.client",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "CatEntityAccessor",
+    "CatEntityMixin",
+    "CatEntityRendererMixin",
+    "CatEntityRenderStateMixin",
+    "EntityRenderDispatcherMixin",
+    "EntityRendererMixin",
+    "LimbAnimatorAccessor",
+    "LivingEntityRendererMixin",
+    "PlayerEntityRendererMixin"
+  ],
+  "verbose": false,
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "mixins": [
+    "EntityMixin"
+  ]
 }
