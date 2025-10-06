@@ -18,7 +18,7 @@ public abstract class EntityRendererMixin<T extends Entity, S extends EntityRend
     private void onGetAndUpdateRenderState(Entity entity, float tickDelta, CallbackInfoReturnable<EntityRenderState> cir) {
         EntityRenderState state = cir.getReturnValue();
         if (state instanceof CustomCatState customCatState) {
-            customCatState.catmodel$setCurrentEntity(entity);
+            customCatState.catmodel$setCurrentEntityId(entity.getUuid());
         }
     }
 }

@@ -240,4 +240,11 @@ public class PlayerToCatReplacer {
             return null;
         }
     }
+
+    public static Entity findAsCat(UUID entityId) {
+        return dummyModelMap.values().stream()
+                .filter(entity -> entityId.equals(entity.getUuid()))
+                .findFirst()
+                .orElse(null);
+    }
 }

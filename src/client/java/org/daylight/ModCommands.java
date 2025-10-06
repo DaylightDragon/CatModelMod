@@ -6,7 +6,11 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.component.Component;
+import net.minecraft.component.ComponentMap;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.passive.CatVariant;
+import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.text.Text;
 import org.daylight.config.ConfigHandler;
@@ -199,6 +203,17 @@ public class ModCommands {
                             })
                     )
             );
+
+//            dispatcher.register(ClientCommandManager.literal("cattest")
+//                .executes(context -> {
+//                    MinecraftClient mc = MinecraftClient.getInstance();
+//
+//                    assert mc.player != null;
+//                    ItemStack stack = mc.player.getEquippedStack(EquipmentSlot.BODY);
+//
+//                    return 1;
+//                })
+//            );
         });
     }
 

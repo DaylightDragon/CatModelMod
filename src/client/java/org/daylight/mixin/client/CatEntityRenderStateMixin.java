@@ -6,6 +6,8 @@ import org.daylight.CustomCatState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
+import java.util.UUID;
+
 @Mixin(CatEntityRenderState.class)
 public class CatEntityRenderStateMixin implements CustomCatState {
     @Unique
@@ -17,7 +19,7 @@ public class CatEntityRenderStateMixin implements CustomCatState {
     @Unique
     private boolean isMainSpecialCat = false;
     @Unique
-    private Entity catmodel$entity;
+    private UUID catmodel$entity;
 
     @Override
     public boolean catmodel$getChargeActive() {
@@ -50,12 +52,12 @@ public class CatEntityRenderStateMixin implements CustomCatState {
     }
 
     @Override
-    public Entity catmodel$getCurrentEntity() {
+    public UUID catmodel$getCurrentEntityId() {
         return catmodel$entity;
     }
 
     @Override
-    public void catmodel$setCurrentEntity(Entity entity) {
+    public void catmodel$setCurrentEntityId(UUID entity) {
         this.catmodel$entity = entity;
     }
 

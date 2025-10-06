@@ -2,6 +2,8 @@ package org.daylight;
 
 import net.minecraft.entity.Entity;
 
+import java.util.UUID;
+
 public interface CustomCatState {
     float catmodel$getChargeProgress();
     void catmodel$setChargeProgress(float value);
@@ -11,6 +13,6 @@ public interface CustomCatState {
     void catmodel$setChargeActive(boolean value);
     boolean catmodel$isMainSpecialCat();
     void catmodel$setAsMainSpecialCat(boolean value);
-    Entity catmodel$getCurrentEntity();
-    void catmodel$setCurrentEntity(Entity entity);
+    UUID catmodel$getCurrentEntityId();
+    void catmodel$setCurrentEntityId(UUID entity);
 }

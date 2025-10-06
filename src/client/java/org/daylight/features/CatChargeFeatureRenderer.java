@@ -15,6 +15,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
 import org.daylight.CustomCatState;
 import org.daylight.config.Data;
+import org.daylight.util.PlayerToCatReplacer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -51,7 +52,9 @@ public class CatChargeFeatureRenderer
     @Override
     protected boolean shouldRender(CatEntityRenderState state) {
         if(state instanceof CustomCatState customCatState) {
-            Entity entity = customCatState.catmodel$getCurrentEntity();
+            UUID entityId = customCatState.catmodel$getCurrentEntityId();
+            if (entityId == null) return false;
+            Entity entity = PlayerToCatReplacer.findAsCat(entityId);
             if (entity == null) return false;
 
             CatChargeData data = getChargeData(entity);
@@ -66,7 +69,9 @@ public class CatChargeFeatureRenderer
     @Override
     protected float getEnergySwirlX(float partialAge) {
         if(currentState instanceof CustomCatState customCatState) {
-            Entity entity = customCatState.catmodel$getCurrentEntity();
+            UUID entityId = customCatState.catmodel$getCurrentEntityId();
+            if (entityId == null) return 0f;
+            Entity entity = PlayerToCatReplacer.findAsCat(entityId);
             if (entity == null) return 0f;
 
             CatChargeData data = getChargeData(entity);
