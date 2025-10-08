@@ -146,7 +146,7 @@ public class ModCommands {
             );
 
             dispatcher.register(ClientCommandManager.literal("cathand")
-                    .executes(context -> performSetCatHandActive(!ConfigHandler.replacementActive.get()))
+                    .executes(context -> performSetCatHandActive(!ConfigHandler.catHandActive.get()))
                     .then(ClientCommandManager.argument("state", StringArgumentType.word())
                             .suggests((context, builder) -> suggestVariants(builder, MODES_OF_OFF))
                             .executes(context -> {

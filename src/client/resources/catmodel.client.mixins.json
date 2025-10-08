@@ -8,6 +8,7 @@
     "CatEntityRendererMixin",
     "CatEntityRenderStateMixin",
     "EntityRenderDispatcherMixin",
+    "EntityRendererAccessor",
     "EntityRendererMixin",
     "LimbAnimatorAccessor",
     "LivingEntityRendererMixin",
