@@ -4,7 +4,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.minecraft.client.MinecraftClient;
 import org.daylight.config.ConfigHandler;
@@ -30,8 +30,8 @@ public class CatifyModClient implements ClientModInitializer {
         CatSkinManager.init();
         OwnResourceReloadListener.register();
 
-		ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register((handler, world) -> {
-			if (world != null) {
+        ClientPlayConnectionEvents.JOIN.register((clientPlayNetworkHandler, packetSender, minecraftClient) -> {
+			if (minecraftClient.world != null) {
                 PlayerToCatReplacer.initWorld();
                 checked.set(false);
 			}
@@ -56,7 +56,7 @@ public class CatifyModClient implements ClientModInitializer {
 //			}
 //		});
 
-		ServerWorldEvents.UNLOAD.register((server, world) -> {
+        ClientPlayConnectionEvents.DISCONNECT.register((server, world) -> {
 			PlayerToCatReplacer.cleanup();
 		});
 
