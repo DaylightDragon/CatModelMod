@@ -97,8 +97,8 @@ public abstract class EntityRenderDispatcherMixin {
 //                    if(catState == null) catState = (CatEntityRenderState) catRenderer.getAndUpdateRenderState(existingCat, tickDelta);
                     playerState = (PlayerEntityRenderState) getRenderer(player).getAndUpdateRenderState(player, tickDelta);
                     if (this.gameOptions.getEntityShadows().getValue()
-                            && this.renderShadows
-                            && !player.isInvisible()) {
+                            && this.renderShadows) {
+//                            && !player.isInvisible()) {
 
                         try {
 //                            Vec3d vec3d = playerRenderer.getPositionOffset(playerState);
