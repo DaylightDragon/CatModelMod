@@ -5,9 +5,11 @@ import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.render.entity.state.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.RotationAxis;
@@ -176,6 +178,19 @@ public abstract class EntityRenderDispatcherMixin {
                     }
                 }
             }
+        }
+    }
+
+    @Inject(
+            method = "Lnet/minecraft/client/render/entity/EntityRenderDispatcher;render(Lnet/minecraft/client/render/entity/state/EntityRenderState;DDDLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/client/render/entity/EntityRenderer;)V",
+            at = @At("HEAD"),
+            cancellable = true
+    )
+    private <S extends EntityRenderState> void render(S state, double x, double y, double z, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, EntityRenderer<?, S> renderer, CallbackInfo ci) throws IllegalAccessException {
+        if(renderer instanceof PlayerEntityRenderer playerRenderer && state instanceof PlayerEntityRenderState playerState) {
+//            System.out.println(playerState.entityType == EntityType.PLAYER);
+//            throw new IllegalAccessException("What is calling this help");
+//            playerState.ent
         }
     }
 
