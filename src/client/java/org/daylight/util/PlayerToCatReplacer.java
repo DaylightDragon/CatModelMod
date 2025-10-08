@@ -18,7 +18,7 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import org.daylight.CatModelModClient;
+import org.daylight.CatifyModClient;
 import org.daylight.CustomCatTextureHolder;
 import org.daylight.config.ConfigHandler;
 import org.daylight.config.Data;
@@ -36,7 +36,7 @@ import java.util.function.Supplier;
 
 @Environment(EnvType.CLIENT)
 public class PlayerToCatReplacer {
-    public static final Logger LOGGER = LoggerFactory.getLogger(CatModelModClient.MOD_ID);
+    public static final Logger LOGGER = LoggerFactory.getLogger(CatifyModClient.MOD_ID);
     private static final MinecraftClient client = MinecraftClient.getInstance();
     private static final Map<UUID, LivingEntity> dummyModelMap = new HashMap<>();
     private static World targetWorld;

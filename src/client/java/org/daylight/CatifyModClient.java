@@ -3,13 +3,10 @@ package org.daylight;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.resource.ResourceType;
 import org.daylight.config.ConfigHandler;
 import org.daylight.util.CatSkinManager;
 import org.daylight.util.PlayerToCatReplacer;
@@ -19,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Environment(EnvType.CLIENT)
-public class CatModelModClient implements ClientModInitializer {
+public class CatifyModClient implements ClientModInitializer {
 	public static final String MOD_ID = "catmodel";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	private static final MinecraftClient client = MinecraftClient.getInstance();

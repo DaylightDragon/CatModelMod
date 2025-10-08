@@ -14,13 +14,12 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.List;
 import java.util.Map;
 
 public class OwnResourceReloadListener implements SimpleSynchronousResourceReloadListener {
     @Override
     public Identifier getFabricId() {
-        return Identifier.of(CatModelModClient.MOD_ID, "example_cat_texture_extractor");
+        return Identifier.of(CatifyModClient.MOD_ID, "example_cat_texture_extractor");
     }
 
     @Override
@@ -29,7 +28,7 @@ public class OwnResourceReloadListener implements SimpleSynchronousResourceReloa
             extractCatTextures(manager);
             extractHandTextures(manager);
         } catch (Throwable t) {
-            CatModelModClient.LOGGER.error("Failed to reload texture extractor, report this to the mod developer", t);
+            CatifyModClient.LOGGER.error("Failed to reload texture extractor, report this to the mod developer", t);
         }
     }
 
@@ -67,7 +66,7 @@ public class OwnResourceReloadListener implements SimpleSynchronousResourceReloa
         try {
             Resource resource = manager.getResource(resourceId).orElse(null);
             if (resource == null) {
-                CatModelModClient.LOGGER.error("Not found: {}", resourceId);
+                CatifyModClient.LOGGER.error("Not found: {}", resourceId);
                 return;
             }
 
@@ -76,7 +75,7 @@ public class OwnResourceReloadListener implements SimpleSynchronousResourceReloa
                 Files.copy(input, outFile, StandardCopyOption.REPLACE_EXISTING);
             }
         } catch (Exception e) {
-            CatModelModClient.LOGGER.error("Error extracting {}: {} ", resourceId, e);
+            CatifyModClient.LOGGER.error("Error extracting {}: {} ", resourceId, e);
         }
     }
 

@@ -1,8 +1,8 @@
 {
 	"schemaVersion": 1,
-	"id": "catmodel",
+	"id": "catify",
 	"version": "${version}",
-	"name": "CatModel",
+	"name": "Catify",
 	"description": "A mod that turns your player model into a cat! :D",
 	"authors": [
 		"Daylight"
@@ -12,20 +12,20 @@
 		"sources": "https://github.com/FabricMC/fabric-example-mod"
 	},
 	"license": "CC0-1.0",
-	"icon": "assets/catmodel/icon.png",
+	"icon": "assets/catify/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-          "org.daylight.CatModelMod"
+          "org.daylight.CatifyMod"
 		],
 		"client": [
-          "org.daylight.CatModelModClient"
+          "org.daylight.CatifyModClient"
 		]
 	},
 	"mixins": [
-      "catmodel.mixins.json",
+      "catify.mixins.json",
 		{
-			"config": "catmodel.client.mixins.json",
+			"config": "catify.client.mixins.json",
 			"environment": "client"
 		}
 	],

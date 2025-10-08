@@ -3,17 +3,14 @@ package org.daylight.mixin.client;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.CatEntityRenderer;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.render.entity.state.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.RotationAxis;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.WorldView;
 import org.daylight.*;
 import org.daylight.config.ConfigHandler;
@@ -69,7 +66,7 @@ public abstract class EntityRenderDispatcherMixin {
                     catRenderer = (EntityRenderer<CatEntity, EntityRenderState>) this.getRenderer(existingCat);
                     if(catRenderer instanceof CustomCatTextureHolder customCatTextureHolder) {
                         if(customCatTextureHolder.catModel$shouldUpdateCustomTexture()) {
-                            CatModelModClient.LOGGER.info("RenderDispatcher updates CatRenderer state");
+                            CatifyModClient.LOGGER.info("RenderDispatcher updates CatRenderer state");
                             catRenderer.getAndUpdateRenderState(existingCat, 0);
                         }
                     }
@@ -84,7 +81,7 @@ public abstract class EntityRenderDispatcherMixin {
                         catRenderer.render(catState, matrices, vertexConsumers, light);
                     }
                 } catch (ClassCastException e) {
-                    CatModelModClient.LOGGER.error("The renderer is most likely not a EntityRenderer<CatEntity, EntityRenderState>", e);
+                    CatifyModClient.LOGGER.error("The renderer is most likely not a EntityRenderer<CatEntity, EntityRenderState>", e);
                 } finally {
                     matrices.pop();
                 }
