@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CatSkinManager {
-    private static final List<String> STATIC_VARIANTS  = List.of(
+    public static final List<String> STATIC_VARIANTS  = List.of(
             "tabby", "black", "red", "siamese",
             "british_shorthair", "calico", "persian",
             "ragdoll", "white", "jellie", "all_black"

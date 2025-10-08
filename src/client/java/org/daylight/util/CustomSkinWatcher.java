@@ -30,7 +30,7 @@ public abstract class CustomSkinWatcher implements Runnable {
 
                     Path changed = skinsDir.resolve((Path) event.context());
                     if (changed.toString().endsWith(".png")) {
-                        System.out.println("[SkinWatcher] Change detected: " + changed);
+//                        System.out.println("[SkinWatcher] Change detected: " + changed);
                         updateSkinList();
                     }
                 }
@@ -53,6 +53,6 @@ public abstract class CustomSkinWatcher implements Runnable {
             e.printStackTrace();
         }
         updateAllVariants();
-        System.out.println("[SkinWatcher] Updated skins: " + skinList);
+//        System.out.println("[SkinWatcher] Updated skins: " + skinList);
     }
 }
