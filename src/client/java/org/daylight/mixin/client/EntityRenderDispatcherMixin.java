@@ -163,7 +163,17 @@ public abstract class EntityRenderDispatcherMixin {
 
                 if (shouldRenderHitboxes()) {
                     if(playerState == null) playerState = (PlayerEntityRenderState) getRenderer(player).getAndUpdateRenderState(player, tickDelta);
-                    if(playerState.hitbox != null) renderHitboxes(matrices, playerState, playerState.hitbox, vertexConsumers);
+                    if(playerState.hitbox != null) {
+                        try {
+                            matrices.push();
+                            matrices.translate(x, y, z);
+                            renderHitboxes(matrices, playerState, playerState.hitbox, vertexConsumers);
+                        } catch (Throwable e) {
+                            e.printStackTrace();
+                        } finally {
+                            matrices.pop();
+                        }
+                    }
                 }
             }
         }
