@@ -106,27 +106,27 @@ public class PlayerToCatReplacer {
         return dummyModelMap.containsValue(catEntity); // && player == MinecraftClient.getInstance().player;
     }
 
-    public static void syncEntity2(AbstractClientPlayerEntity player, CatEntity existingCat) {
-        existingCat.lastX = player.lastX;
-        existingCat.lastY = player.lastY;
-        existingCat.lastZ = player.lastZ;
+    public static void syncEntity2(AbstractClientPlayerEntity player, CatEntity existingCat, float tickDelta) {
+        existingCat.prevX = player.prevX;
+        existingCat.prevY = player.prevY;
+        existingCat.prevZ = player.prevZ;
         existingCat.setPos(player.getX(), player.getY(), player.getZ());
 
-        existingCat.lastYaw = player.lastYaw;
+        existingCat.prevYaw = player.prevYaw;
         existingCat.setYaw(player.getYaw());
 
-        existingCat.lastPitch = player.lastPitch;
+        existingCat.prevPitch = player.prevPitch;
         existingCat.setPitch(player.getPitch());
 
-        existingCat.lastBodyYaw = player.lastBodyYaw;
+        existingCat.prevBodyYaw = player.prevBodyYaw;
         existingCat.bodyYaw = player.bodyYaw;
 
-        existingCat.lastHeadYaw = player.lastHeadYaw;
+        existingCat.prevHeadYaw = player.prevHeadYaw;
         existingCat.headYaw = player.headYaw;
 
         // Sitting
-        double dx = player.getX() - player.lastX;
-        double dz = player.getZ() - player.lastZ;
+        double dx = player.getX() - player.prevX;
+        double dz = player.getZ() - player.prevZ;
         double horizontalSpeed = Math.sqrt(dx * dx + dz * dz);
 
         boolean sneaking = player.isSneaking(); // or isInSneakingPose()
@@ -153,15 +153,15 @@ public class PlayerToCatReplacer {
         );
 
         if (existingCat.limbAnimator instanceof LimbAnimatorAccessor acc) {
-            acc.setAnimationProgress(player.limbAnimator.getAnimationProgress());
+            acc.setAnimationProgress(player.limbAnimator.getPos(tickDelta));
         }
 //        }
     }
 
     private static float getPlayerMovementSpeed(AbstractClientPlayerEntity player) {
         // Вычисляем скорость движения игрока
-        double dx = player.getX() - player.lastX;
-        double dz = player.getZ() - player.lastZ;
+        double dx = player.getX() - player.prevX;
+        double dz = player.getZ() - player.prevZ;
         double horizontalSpeed = Math.sqrt(dx * dx + dz * dz);
 
         // Нормализуем скорость для анимаций
@@ -230,7 +230,7 @@ public class PlayerToCatReplacer {
 
             NativeImage image = NativeImage.read(new FileInputStream(file));
             Supplier<String> nameSupplier = () -> subfolder + "/" + skinName;
-            NativeImageBackedTexture texture = new NativeImageBackedTexture(nameSupplier, image);
+            NativeImageBackedTexture texture = new NativeImageBackedTexture(image);
 
             Identifier id = Identifier.of("catmodel", nameSupplier.get());
             MinecraftClient.getInstance().getTextureManager().registerTexture(id, texture);

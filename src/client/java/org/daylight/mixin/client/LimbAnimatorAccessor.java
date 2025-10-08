@@ -11,10 +11,10 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 @Mixin(LimbAnimator.class)
 public interface LimbAnimatorAccessor {
 
-    @Accessor("animationProgress")
+    @Accessor("pos")
     float getAnimationProgress();
 
-    @Accessor("animationProgress")
+    @Accessor("pos")
     void setAnimationProgress(float progress);
 
     @Accessor("speed")

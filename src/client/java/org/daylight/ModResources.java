@@ -1,7 +1,6 @@
 package org.daylight;
 
 import net.minecraft.entity.passive.CatVariant;
-import net.minecraft.entity.passive.CatVariants;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.Identifier;
 
@@ -21,17 +20,17 @@ public class ModResources {
     public static final Identifier WHITE_HAND_TEXTURE       = Identifier.of(CatifyMod.MOD_ID, "textures/entity/white_hand.png");
 
     public static final Map<RegistryKey<CatVariant>, Identifier> CAT_HAND_BY_VARIANT = Map.ofEntries(
-            Map.entry(CatVariants.ALL_BLACK, ALL_BLACK_HAND_TEXTURE),
-            Map.entry(CatVariants.BLACK, BLACK_HAND_TEXTURE),
-            Map.entry(CatVariants.BRITISH_SHORTHAIR, BRITISH_SHORTHAIR_HAND_TEXTURE),
-            Map.entry(CatVariants.CALICO, CALICO_HAND_TEXTURE),
-            Map.entry(CatVariants.JELLIE, JELLIE_HAND_TEXTURE),
-            Map.entry(CatVariants.PERSIAN, PERSIAN_HAND_TEXTURE),
-            Map.entry(CatVariants.RAGDOLL, RAGDOLL_HAND_TEXTURE),
-            Map.entry(CatVariants.RED, RED_HAND_TEXTURE),
-            Map.entry(CatVariants.SIAMESE, SIAMESE_HAND_TEXTURE),
-            Map.entry(CatVariants.TABBY, TABBY_HAND_TEXTURE),
-            Map.entry(CatVariants.WHITE, WHITE_HAND_TEXTURE)
+            Map.entry(CatVariant.ALL_BLACK, ALL_BLACK_HAND_TEXTURE),
+            Map.entry(CatVariant.BLACK, BLACK_HAND_TEXTURE),
+            Map.entry(CatVariant.BRITISH_SHORTHAIR, BRITISH_SHORTHAIR_HAND_TEXTURE),
+            Map.entry(CatVariant.CALICO, CALICO_HAND_TEXTURE),
+            Map.entry(CatVariant.JELLIE, JELLIE_HAND_TEXTURE),
+            Map.entry(CatVariant.PERSIAN, PERSIAN_HAND_TEXTURE),
+            Map.entry(CatVariant.RAGDOLL, RAGDOLL_HAND_TEXTURE),
+            Map.entry(CatVariant.RED, RED_HAND_TEXTURE),
+            Map.entry(CatVariant.SIAMESE, SIAMESE_HAND_TEXTURE),
+            Map.entry(CatVariant.TABBY, TABBY_HAND_TEXTURE),
+            Map.entry(CatVariant.WHITE, WHITE_HAND_TEXTURE)
     );
     public static final Identifier GHOST_TEXTURE = Identifier.of(CatifyMod.MOD_ID, "textures/entity/cat_charge.png");;
 

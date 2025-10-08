@@ -2,6 +2,8 @@ package org.daylight.mixin.client;
 
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.option.GameOptions;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.render.entity.EntityRenderer;
@@ -25,6 +27,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EntityRenderDispatcher.class)
 public abstract class EntityRenderDispatcherMixin {
+    @Shadow
+    protected static void renderShadow(MatrixStack matrices, VertexConsumerProvider vertexConsumers, EntityRenderState renderState, float opacity, float tickDelta, WorldView world, float radius) {
+    }
+
+    @Shadow
+    protected static void renderHitbox(MatrixStack matrices, VertexConsumer vertices, Entity entity, float tickDelta, float red, float green, float blue) {
+    }
+
     @Shadow
     private boolean renderShadows;
     @Shadow
@@ -57,7 +67,7 @@ public abstract class EntityRenderDispatcherMixin {
             PlayerEntityRenderState playerState = null;
 
             if (existingCat != null) {
-                PlayerToCatReplacer.syncEntity2(player, existingCat);
+                PlayerToCatReplacer.syncEntity2(player, existingCat, tickDelta);
 
                 matrices.push();
                 matrices.translate(x, y, z);
@@ -117,6 +127,7 @@ public abstract class EntityRenderDispatcherMixin {
                                             vertexConsumers,
                                             playerState,
                                             opacity,
+                                            tickDelta,
                                             player.getWorld(),
                                             Math.min(shadowRadius, 32.0f)
                                     );
@@ -163,11 +174,11 @@ public abstract class EntityRenderDispatcherMixin {
 
                 if (shouldRenderHitboxes()) {
                     if(playerState == null) playerState = (PlayerEntityRenderState) getRenderer(player).getAndUpdateRenderState(player, tickDelta);
-                    if(playerState.hitbox != null) {
+                    if(vertexConsumers.getBuffer(RenderLayer.LINES) != null) {
                         try {
                             matrices.push();
                             matrices.translate(x, y, z);
-                            renderHitboxes(matrices, playerState, playerState.hitbox, vertexConsumers);
+                            renderHitbox(matrices, vertexConsumers.getBuffer(RenderLayer.LINES), player, tickDelta, 1.0f, 1.0f, 1.0f);
                         } catch (Throwable e) {
                             e.printStackTrace();
                         } finally {
@@ -180,15 +191,8 @@ public abstract class EntityRenderDispatcherMixin {
     }
 
     @Shadow
-    private static void renderShadow(MatrixStack matrices, VertexConsumerProvider vertexConsumers, EntityRenderState renderState, float opacity, WorldView world, float radius) {
-    }
-
-    @Shadow
     public abstract <T extends Entity> EntityRenderer getRenderer(T entity);
 
     @Shadow
     public abstract boolean shouldRenderHitboxes();
-
-    @Shadow
-    protected abstract void renderHitboxes(MatrixStack matrices, EntityRenderState state, EntityHitboxAndView hitbox, VertexConsumerProvider vertexConsumers);
 }
