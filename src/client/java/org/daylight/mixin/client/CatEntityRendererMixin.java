@@ -23,7 +23,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class CatEntityRendererMixin {
     @Inject(method = "<init>", at = @At("RETURN"))
     private void onInit(EntityRendererFactory.Context context, CallbackInfo ci) {
-        var feature = new CatChargeFeatureRenderer((FeatureRendererContext<CatEntityRenderState, CatEntityModel>) this, context.getEntityModels(), ModResources.GHOST_TEXTURE);
+        var feature = new CatChargeFeatureRenderer((FeatureRendererContext<CatEntityRenderState, CatEntityModel>) this, ModResources.GHOST_TEXTURE); // context.getEntityModels() removed in 1.21.3
         if((Object) this instanceof IFeatureManager featureManager) {
             featureManager.catmodel$addFeature(feature);
         }

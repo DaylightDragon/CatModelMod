@@ -2,13 +2,13 @@ package org.daylight.features;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.feature.EnergySwirlOverlayFeatureRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.model.CatEntityModel;
 import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.render.entity.model.EntityModelLayers;
-import net.minecraft.client.render.entity.model.LoadedEntityModels;
 import net.minecraft.client.render.entity.state.CatEntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
@@ -41,12 +41,12 @@ public class CatChargeFeatureRenderer
 
     public CatChargeFeatureRenderer(
             FeatureRendererContext<CatEntityRenderState, CatEntityModel> context,
-            LoadedEntityModels loader,
+//            LoadedEntityModels loader,
             Identifier texture
     ) {
         super(context);
         this.texture = texture;
-        this.model = new CatEntityModel(loader.getModelPart(EntityModelLayers.CAT));
+        this.model = new CatEntityModel(MinecraftClient.getInstance().getEntityModelLoader().getModelPart(EntityModelLayers.CAT));
     }
 
     @Override

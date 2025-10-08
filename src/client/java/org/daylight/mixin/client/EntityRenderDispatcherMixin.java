@@ -103,41 +103,28 @@ public abstract class EntityRenderDispatcherMixin {
                     if(playerRenderer == null) playerRenderer = this.getRenderer(player);
 //                    if(catState == null) catState = (CatEntityRenderState) catRenderer.getAndUpdateRenderState(existingCat, tickDelta);
                     playerState = (PlayerEntityRenderState) getRenderer(player).getAndUpdateRenderState(player, tickDelta);
-                    if (this.gameOptions.getEntityShadows().getValue()
-                            && this.renderShadows) {
-//                            && !player.isInvisible()) {
-
                         try {
-//                            Vec3d vec3d = playerRenderer.getPositionOffset(playerState);
+//                        Vec3d vec3d = playerRenderer.getPositionOffset(playerState);
 
-                            matrices.push();
-                            matrices.translate(x, y, z);
+                        matrices.push();
+                        matrices.translate(x, y, z);
 
-                            if (playerRenderer instanceof EntityRendererAccessor accessor) {
-                                float shadowRadius = accessor.callGetShadowRadius(catState);
-                                float opacity = (float) ((1.0 - (playerState.squaredDistanceToCamera) / 256.0)
-                                        * (double) accessor.callGetShadowOpacity(catState));
-
-//                                System.out.println(x + " " + vec3d.getX() + " " +  y + " " + vec3d.getY() + " " +  z + " " + vec3d.getZ());
-//                                System.out.println(shadowRadius + " " + opacity + matrices.peek().getPositionMatrix());
-
-                                if (shadowRadius > 0 && opacity > 0) {
-                                    renderShadow(
-                                            matrices,
-                                            vertexConsumers,
-                                            playerState,
-                                            opacity,
-                                            tickDelta,
-                                            player.getWorld(),
-                                            Math.min(shadowRadius, 32.0f)
-                                    );
+                        if (playerRenderer instanceof EntityRendererAccessor accessor && playerRenderer instanceof IShadowHolder shadowHolder) {
+                            if ((Boolean)this.gameOptions.getEntityShadows().getValue() && this.renderShadows) {
+                                float g = accessor.callGetShadowRadius(playerState);
+                                if (g > 0.0F) {
+                                    double h = playerState.squaredDistanceToCamera;
+                                    float i = (float)(((double)1.0F - h / (double)256.0F) * (double) shadowHolder.catModel$getShadowOpacityAccessor(playerState)); // playerRenderer.getShadowOpacity(playerState) replaced with 1f in 1.21.3
+                                    if (i > 0.0F) {
+                                        renderShadow(matrices, vertexConsumers, playerState, i, tickDelta, player.getWorld(), Math.min(g, 32.0F));
+                                    }
                                 }
                             }
-                        } catch (Throwable t) {
-                            t.printStackTrace();
-                        } finally {
-                            matrices.pop();
                         }
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                    } finally {
+                        matrices.pop();
                     }
                 }
 

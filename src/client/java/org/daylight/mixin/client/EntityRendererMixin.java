@@ -10,6 +10,7 @@ import org.daylight.CustomCatState;
 import org.daylight.IShadowHolder;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -19,16 +20,22 @@ public abstract class EntityRendererMixin<T extends Entity, S extends EntityRend
     @Shadow
     public abstract float getShadowRadius(S state);
 
-    @Shadow
-    public abstract float getShadowOpacity(S state);
+    @Unique
+    public float catModel$getShadowOpacityAccessor(EntityRenderState state) {
+        return shadowOpacity;
+    }
 
+    @Shadow
+    protected float shadowOpacity;
+
+    @Unique
     public float getShadowRadiusAccessor(CatEntityRenderState state) {
         return getShadowRadius((S) state);
     }
 
-    public float getShadowOpacityAccessor(CatEntityRenderState state) {
-        return getShadowOpacity((S) state);
-    }
+//    public float getShadowOpacityAccessor(CatEntityRenderState state) {
+//        return getShadowOpacity((S) state);
+//    }
 
     @Inject(method = "getAndUpdateRenderState", at = @At("RETURN"))
     private void onGetAndUpdateRenderState(Entity entity, float tickDelta, CallbackInfoReturnable<EntityRenderState> cir) {

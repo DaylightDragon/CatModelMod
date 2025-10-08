@@ -10,6 +10,6 @@ public interface EntityRendererAccessor {
     @Invoker("getShadowRadius")
     float callGetShadowRadius(EntityRenderState state);
 
-    @Invoker("getShadowOpacity")
-    float callGetShadowOpacity(EntityRenderState state);
+//    @Invoker("getShadowOpacity")
+//    float callGetShadowOpacity(EntityRenderState state);
 }
