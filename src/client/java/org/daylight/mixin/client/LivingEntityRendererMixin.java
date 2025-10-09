@@ -8,6 +8,7 @@ import net.minecraft.client.render.entity.state.LivingEntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import org.daylight.IFeatureManager;
+import org.daylight.features.CatChargeFeatureRenderer;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 
@@ -35,5 +36,13 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, S extend
         for(FeatureRenderer featureRenderer : features) {
             if(filter.test(featureRenderer)) featureRenderer.render(matrixStack, vertexConsumerProvider, i, livingEntityRenderState, ((LivingEntityRenderState)livingEntityRenderState).relativeHeadYaw, ((LivingEntityRenderState)livingEntityRenderState).pitch);
         }
+    }
+
+    @Override
+    public CatChargeFeatureRenderer getCatChargeFeatureRenderer() {
+        for(FeatureRenderer featureRenderer : features) {
+            if(featureRenderer instanceof CatChargeFeatureRenderer) return (CatChargeFeatureRenderer) featureRenderer;
+        }
+        return null;
     }
 }

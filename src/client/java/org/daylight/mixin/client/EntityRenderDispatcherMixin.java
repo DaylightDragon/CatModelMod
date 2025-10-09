@@ -17,6 +17,7 @@ import net.minecraft.world.WorldView;
 import org.daylight.*;
 import org.daylight.config.ConfigHandler;
 import org.daylight.features.CatChargeFeatureRenderer;
+import org.daylight.util.ModStateUtils;
 import org.daylight.util.PlayerToCatReplacer;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -78,7 +79,7 @@ public abstract class EntityRenderDispatcherMixin {
 //                    if(catState instanceof CustomCatState customCatState) customCatState.catmodel$setChargeActive(false);
                     CatChargeFeatureRenderer.getChargeData(existingCat).chargeActive = false;
 
-                    if((visible || behaviour == InvisibilityBehaviour.NEVER)) {
+                    if(ModStateUtils.shouldRenderCat(player)) {
                         // Just cat
                         catRenderer.render(catState, matrices, vertexConsumers, light);
                     }
@@ -90,7 +91,7 @@ public abstract class EntityRenderDispatcherMixin {
 
                 // Shadow, after the cat render
 
-                if((visible || behaviour == InvisibilityBehaviour.NEVER || behaviour == InvisibilityBehaviour.CHARGED)) {
+                if(ModStateUtils.shouldRenderShadow(player)) {
 //                    if(catRenderer == null) catRenderer = (EntityRenderer<CatEntity, EntityRenderState>) this.getRenderer(existingCat);
                     if(playerRenderer == null) playerRenderer = this.getRenderer(player);
 //                    if(catState == null) catState = (CatEntityRenderState) catRenderer.getAndUpdateRenderState(existingCat, tickDelta);
@@ -137,7 +138,7 @@ public abstract class EntityRenderDispatcherMixin {
 
                 // Charge
 
-                if(!visible && behaviour == InvisibilityBehaviour.CHARGED) {
+                if(ModStateUtils.shouldRenderCharge(player)) {
                     if(catRenderer instanceof IFeatureManager featureManager) {
                         if(catState == null) catState = (CatEntityRenderState) catRenderer.getAndUpdateRenderState(existingCat, tickDelta);
 
@@ -152,7 +153,7 @@ public abstract class EntityRenderDispatcherMixin {
 
                             CatChargeFeatureRenderer.getChargeData(existingCat).chargeActive = true;
 
-                            featureManager.renderAllFeatures(catState, matrices, vertexConsumers, light, featureRenderer -> featureRenderer instanceof CatChargeFeatureRenderer);
+                            featureManager.getCatChargeFeatureRenderer().customRender(matrices, vertexConsumers, light, catState, catState.relativeHeadYaw, catState.pitch);
                         } catch (Throwable e) {
                             e.printStackTrace();
                         } finally {

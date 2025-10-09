@@ -5,9 +5,11 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.minecraft.client.MinecraftClient;
 import org.daylight.config.ConfigHandler;
+import org.daylight.features.CatChargeFeatureRenderer;
 import org.daylight.util.CatSkinManager;
 import org.daylight.util.PlayerToCatReplacer;
 import org.slf4j.Logger;
@@ -66,5 +68,11 @@ public class CatifyModClient implements ClientModInitializer {
 //				PlayerToCatReplacer.syncEntities();
 //			}
 //		});
+
+        WorldRenderEvents.START.register(context -> {
+            if(!MinecraftClient.getInstance().isPaused()) {
+                CatChargeFeatureRenderer.moveGlobalTextureForward(context.tickCounter().getTickProgress(true));
+            }
+        });
 	}
 }

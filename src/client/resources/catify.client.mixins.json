@@ -15,8 +15,6 @@
     "LimbAnimatorAccessor",
     "LivingEntityRendererMixin",
     "PlayerEntityRendererMixin",
-    "PlayerSkinGuiElementRendererMixin",
-    "PlayerSkinGuiElementRenderStateAccessor",
     "SpecialGuiElementRendererAccessor"
   ],
   "verbose": false,
