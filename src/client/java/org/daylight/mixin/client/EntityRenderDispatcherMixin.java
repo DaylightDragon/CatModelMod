@@ -86,6 +86,10 @@ public abstract class EntityRenderDispatcherMixin {
 //                    if(catState instanceof CustomCatState customCatState) customCatState.catmodel$setChargeActive(false);
                     CatChargeFeatureRenderer.getChargeData(existingCat).chargeActive = false;
 
+                    if(playerState == null) playerState = (PlayerEntityRenderState) getRenderer(player).getAndUpdateRenderState(player, tickDelta);
+                    if(ConfigHandler.catDamageVisible.getCached()) catState.hurt = playerState.hurt;
+                    else catState.hurt = false;
+
                     if((visible || behaviour == InvisibilityBehaviour.NEVER)) {
                         // Just cat
                         catRenderer.render(catState, matrices, vertexConsumers, light);
