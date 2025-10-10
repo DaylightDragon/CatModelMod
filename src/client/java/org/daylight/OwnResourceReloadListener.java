@@ -53,7 +53,7 @@ public class OwnResourceReloadListener implements SimpleSynchronousResourceReloa
 
     private Path createOutputDir(String folderName) {
         Path outputDir = MinecraftClient.getInstance().runDirectory.toPath()
-                .resolve("data/cat_model_custom/example_skins/" + folderName);
+                .resolve("data/catify/example_skins/" + folderName);
         try {
             Files.createDirectories(outputDir);
         } catch (IOException e) {
