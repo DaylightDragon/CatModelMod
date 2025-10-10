@@ -65,9 +65,17 @@ public class CatChargeFeatureRenderer
 
     private CatEntityRenderState currentState = null;
 
-    private static float mainGlobalCatProgress = 0;
+    public static float globalProgress = 0;
+    public static void moveGlobalTextureForward(float tickDelta) {
+        globalProgress += tickDelta * 0.008f;
+        if(globalProgress >= 8000f) {
+            globalProgress = 0f;
+        }
+    }
+
     @Override
     protected float getEnergySwirlX(float partialAge) {
+        if(true) return globalProgress;
         if(currentState instanceof CustomCatState customCatState) {
             UUID entityId = customCatState.catmodel$getCurrentEntityId();
             if (entityId == null) return 0f;
