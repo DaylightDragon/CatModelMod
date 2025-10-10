@@ -219,7 +219,7 @@ public class PlayerToCatReplacer {
 
     public static Identifier loadCustomTexture(String subfolder, String skinName) {
         try {
-            String basePath = MinecraftClient.getInstance().runDirectory.getAbsolutePath() + "/data/cat_model_custom/" + subfolder;
+            String basePath = MinecraftClient.getInstance().runDirectory.getAbsolutePath() + "/data/catify/" + subfolder;
             File folder = new File(basePath);
             folder.mkdirs();
 //            System.out.println(Arrays.toString(folder.listFiles()));
@@ -232,7 +232,7 @@ public class PlayerToCatReplacer {
             Supplier<String> nameSupplier = () -> subfolder + "/" + skinName;
             NativeImageBackedTexture texture = new NativeImageBackedTexture(image);
 
-            Identifier id = Identifier.of("catmodel", nameSupplier.get());
+            Identifier id = Identifier.of("catify", nameSupplier.get());
             MinecraftClient.getInstance().getTextureManager().registerTexture(id, texture);
             return id;
         } catch (Exception e) {
