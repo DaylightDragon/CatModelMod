@@ -69,6 +69,8 @@ public class CatSkinManager {
             if(!PlayerToCatReplacer.setCustomCatEntityTexture(MinecraftClient.getInstance().player, ConfigHandler.catVariant.get())) {
                 ConfigHandler.catVariant.set("JELLIE");
                 ConfigHandler.catVariantVanilla.set(true);
+
+                PlayerToCatReplacer.setLocalCatVariant(CatVariantUtils.deserializeVariant(ConfigHandler.catVariant.getCached()));
             } else {
                 PlayerToCatReplacer.setCustomCatHandTexture(ConfigHandler.catVariant.get());
             }
