@@ -8,11 +8,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.component.Component;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.passive.CatVariant;
-import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.text.Text;
 import org.daylight.config.ConfigHandler;
@@ -176,7 +172,7 @@ public class ModCommands {
                                 if(stateStr.equalsIgnoreCase("never")) {
                                     behaviour = InvisibilityBehaviour.NEVER;
                                 } else if(stateStr.equals("vanilla")) {
-                                    behaviour = InvisibilityBehaviour.USUAL;
+                                    behaviour = InvisibilityBehaviour.VANILLA;
                                 } else if(stateStr.equals("charged")) {
                                     behaviour = InvisibilityBehaviour.CHARGED;
                                 } else {

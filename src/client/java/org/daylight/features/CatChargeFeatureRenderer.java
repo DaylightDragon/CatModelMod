@@ -6,6 +6,7 @@ import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.render.entity.feature.EnergySwirlOverlayFeatureRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.model.CatEntityModel;
@@ -13,11 +14,15 @@ import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.render.entity.model.EntityModelLayers;
 import net.minecraft.client.render.entity.model.LoadedEntityModels;
 import net.minecraft.client.render.entity.state.CatEntityRenderState;
+import net.minecraft.client.render.entity.state.EntityRenderState;
+import net.minecraft.client.render.entity.state.LivingEntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
 import org.daylight.CustomCatState;
+import org.daylight.IRenderableFeature;
 import org.daylight.config.Data;
+import org.daylight.mixin.client.FeatureRendererAccessor;
 import org.daylight.util.PlayerToCatReplacer;
 
 import java.util.HashMap;
@@ -25,7 +30,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Environment(EnvType.CLIENT)
-public class CatChargeFeatureRenderer
+public class CatChargeFeatureRenderer<S extends EntityRenderState>
         extends EnergySwirlOverlayFeatureRenderer<CatEntityRenderState, CatEntityModel> {
     private final Identifier texture;
     private final CatEntityModel model;
@@ -96,14 +101,7 @@ public class CatChargeFeatureRenderer
         } return 0;
     }
 
-    public void customRender(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CatEntityRenderState state, float limbAngle, float limbDistance) {
-        VertexConsumer vertexConsumer = vertexConsumers.getBuffer(
-                RenderLayer.getEnergySwirl(this.getEnergySwirlTexture(), this.getEnergySwirlX(globalProgress) % 1.0F, globalProgress * 0.01F % 1.0F)
-        );
-        customRender(matrices, vertexConsumer, light, state, limbAngle, limbDistance);
-    }
-
-    public void customRender(MatrixStack matrices, VertexConsumer vertexConsumers, int light, CatEntityRenderState state, float limbAngle, float limbDistance) {
+    public void customRender(MatrixStack matrices, OrderedRenderCommandQueue queue, int light, CatEntityRenderState state, float limbAngle, float limbDistance) {
 //        this.currentState = state; // temporary
 
 //        if (state instanceof CustomCatState custom) {
@@ -111,15 +109,18 @@ public class CatChargeFeatureRenderer
 //            custom.catmodel$setChargeProgress(progress);
 //        }
 
-        internalRender(matrices, vertexConsumers, light, state, limbAngle, limbDistance);
+        internalRender(matrices, queue, light, state, limbAngle, limbDistance);
 //        this.currentState = null;
     }
 
-    private void internalRender(MatrixStack matrices, VertexConsumer vertexConsumer, int light, CatEntityRenderState state, float limbAngle, float limbDistance) {
-        if (this.shouldRender(state)) {
-            CatEntityModel entityModel = this.getEnergySwirlModel();
-            entityModel.setAngles(state);
-            entityModel.render(matrices, vertexConsumer, light, OverlayTexture.DEFAULT_UV, -8355712);
+    private void internalRender(MatrixStack matrices, OrderedRenderCommandQueue queue, int light, CatEntityRenderState state, float limbAngle, float limbDistance) {
+        if(state instanceof CatEntityRenderState catEntityRenderState && this instanceof IRenderableFeature<?> renderableFeature) {
+            if (this.shouldRender(catEntityRenderState)) {
+                CatEntityModel entityModel = this.getEnergySwirlModel();
+                entityModel.setAngles(catEntityRenderState);
+                renderableFeature.catify$render(matrices, queue, light, state, limbAngle, limbDistance);
+//                entityModel.render(matrices, queue, light, OverlayTexture.DEFAULT_UV, -8355712);
+            }
         }
     }
 

@@ -28,6 +28,7 @@ import org.daylight.config.ConfigHandler;
 import org.daylight.features.CatChargeFeatureRenderer;
 import org.daylight.util.ModStateUtils;
 import org.daylight.util.PlayerToCatReplacer;
+import org.daylight.util.StateStorage;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Mixin;
@@ -74,13 +75,18 @@ public class EntityGuiElementRendererMixin { // NEW
                 EntityRenderManager dispatcher = mc.getEntityRenderDispatcher();
                 CatEntity cat = (CatEntity) PlayerToCatReplacer.getCatForPlayer(mc.player);
 
-                if(cat == null) return;
-                ci.cancel();
+                StateStorage.inventoryRelativeHeadYaw = playerEntityRenderState.relativeHeadYaw;
+                StateStorage.inventoryBodyYaw = playerEntityRenderState.bodyYaw;
+                StateStorage.inventoryPitch = playerEntityRenderState.pitch;
 
-                mc.gameRenderer.getDiffuseLighting().setShaderLights(DiffuseLighting.Type.PLAYER_SKIN);
+                if(cat == null) return;
+//                ci.cancel(); // TODO
+                if(true) return;
+
+//                mc.gameRenderer.getDiffuseLighting().setShaderLights(DiffuseLighting.Type.PLAYER_SKIN);
 
                 LivingEntityRenderer<CatEntity, CatEntityRenderState, CatEntityModel> renderer = (LivingEntityRenderer<CatEntity, CatEntityRenderState, CatEntityModel>) dispatcher.getRenderer(cat);
-                CatEntityRenderState renderState = renderer.createRenderState();
+                CatEntityRenderState renderState = (CatEntityRenderState) renderer.getAndUpdateRenderState(cat, MinecraftClient.getInstance().getRenderTickCounter().getTickProgress(true)); // renderer.createRenderState();
                 renderer.updateRenderState(cat, renderState, 0); // mc.getRenderTickCounter().getTickProgress(true)
                 CatChargeFeatureRenderer.getChargeData(cat).chargeActive = false;
 
@@ -90,7 +96,8 @@ public class EntityGuiElementRendererMixin { // NEW
 
                 Vector3f translation = state.translation();
 
-                if(ModStateUtils.shouldRenderCat(mc.player)) {/*
+                if(ModStateUtils.shouldRenderCat(mc.player)) {
+                    /*
                     try {
                         matrices.push();
                         matrices.translate(translation.x, translation.y, translation.z);
@@ -170,5 +177,15 @@ public class EntityGuiElementRendererMixin { // NEW
 //                CatEntityModel catModel = renderer.getModel();
             }
         }
+    }
+
+    @Inject(
+            method = "Lnet/minecraft/client/gui/render/EntityGuiElementRenderer;render(Lnet/minecraft/client/gui/render/state/special/EntityGuiElementRenderState;Lnet/minecraft/client/util/math/MatrixStack;)V",
+            at = @At("TAIL")
+    )
+    protected void afterRender(EntityGuiElementRenderState state, MatrixStack matrices, CallbackInfo ci) {
+        StateStorage.inventoryRelativeHeadYaw = null;
+        StateStorage.inventoryBodyYaw = null;
+        StateStorage.inventoryPitch = null;
     }
 }

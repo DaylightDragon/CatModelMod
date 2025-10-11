@@ -4,8 +4,10 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
+import net.minecraft.client.render.entity.state.EntityRenderState;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -98,6 +100,18 @@ public class PlayerToCatReplacer {
                 player == MinecraftClient.getInstance().player;
     }
 
+    public static PlayerEntity getPlayerById(UUID uuid) {
+        ClientWorld world = MinecraftClient.getInstance().world;
+
+        if (world != null) {
+            PlayerEntity player = world.getPlayerByUuid(uuid);
+            if (player != null) {
+                return player;
+            }
+        }
+        return null;
+    }
+
     public static LivingEntity getCatForPlayer(PlayerEntity player) {
         return dummyModelMap.get(player.getUuid());
     }
@@ -106,7 +120,7 @@ public class PlayerToCatReplacer {
         return dummyModelMap.containsValue(catEntity); // && player == MinecraftClient.getInstance().player;
     }
 
-    public static void syncEntity2(AbstractClientPlayerEntity player, CatEntity existingCat) {
+    public static void syncEntity2(PlayerEntity player, CatEntity existingCat) {
         existingCat.lastX = player.lastX;
         existingCat.lastY = player.lastY;
         existingCat.lastZ = player.lastZ;

@@ -33,9 +33,10 @@ public abstract class PlayerEntityRendererMixin<AvatarlikeEntity extends PlayerL
             method = "updateRenderState(Lnet/minecraft/entity/PlayerLikeEntity;Lnet/minecraft/client/render/entity/state/PlayerEntityRenderState;F)V",
             at = @At("HEAD")
     )
-    public void updateRenderState(AvatarlikeEntity playerLikeEntity, PlayerEntityRenderState playerEntityRenderState, float f, CallbackInfo ci) {
-        if(playerLikeEntity instanceof ClientPlayerEntity clientPlayerEntity) {
-            StateStorage.currentStates.put(playerEntityRenderState, clientPlayerEntity);
+    public void updateRenderState(AvatarlikeEntity playerLikeEntity, PlayerEntityRenderState state, float f, CallbackInfo ci) {
+        if(playerLikeEntity instanceof ClientPlayerEntity clientPlayerEntity && state instanceof PlayerEntityRenderState) {
+            System.out.println("Adding from PlayerEntityRenderer: " + state);
+            StateStorage.currentStates.put(state, clientPlayerEntity.getUuid());
         }
     }
 
