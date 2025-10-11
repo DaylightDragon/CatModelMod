@@ -15,7 +15,7 @@ Just run **`/catvariant <name>`** to change the cat skin!
 
 ### Custom Skins Supported!
 
-To add an own skin, go to your minecraft folder, then `data/catify_custom/custom_cat_skins`, put a texture there and it will now automatically appear in the list!  
+To add an own skin, go to your minecraft folder, then `data/catify/cat_enitity_skins`, put a texture there and it will now automatically appear in the list!  
 
 You can find example textutes in an example folder nearby.  
 
@@ -30,7 +30,7 @@ This is togglable with **`/cathand <optional on/of>`**
 Custom skins can have a custom cat hand too!
 
 For that, place the required player skin texture in 
-`data/catify_custom/custom_cat_hands` and name it **the exact same name** as the custom cat skin earlier (custom cat hand requires a custom cat skin, but you can take both from the example folder nearby.  
+`data/catify/cat_hand_skins` and name it **the exact same name** as the custom cat skin earlier (custom cat hand requires a custom cat skin, but you can take both from the example folder nearby.  
 
 ## Invisibility Behavior
 Because **YOU CAN'T see ARMOR on the cat**, it can be disorienting in 3rd person, when your player is invisible.  
