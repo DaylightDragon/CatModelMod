@@ -26,6 +26,6 @@ public class ConfigHandler {
         replacementActive = new FabricBooleanConfigValue(CONFIG, "replacementActive", true);
         catHandActive = new FabricBooleanConfigValue(CONFIG, "catHandActive", true);
         catDamageVisible = new FabricBooleanConfigValue(CONFIG, "catDamageVisible", true);
-        invisibilityBehaviour = new FabricEnumConfigValue(CONFIG, "invisibilityBehaviour", InvisibilityBehaviour.USUAL);
+        invisibilityBehaviour = new FabricEnumConfigValue(CONFIG, "invisibilityBehaviour", InvisibilityBehaviour.VANILLA);
     }
 }

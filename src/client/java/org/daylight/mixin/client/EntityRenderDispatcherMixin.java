@@ -69,7 +69,7 @@ public abstract class EntityRenderDispatcherMixin {
                     catRenderer = (EntityRenderer<CatEntity, EntityRenderState>) this.getRenderer(existingCat);
                     if(catRenderer instanceof CustomCatTextureHolder customCatTextureHolder) {
                         if(customCatTextureHolder.catModel$shouldUpdateCustomTexture()) {
-                            CatifyModClient.LOGGER.info("RenderDispatcher updates CatRenderer state");
+//                            CatifyModClient.LOGGER.info("RenderDispatcher updates CatRenderer state");
                             catRenderer.getAndUpdateRenderState(existingCat, 0);
                         }
                     }
