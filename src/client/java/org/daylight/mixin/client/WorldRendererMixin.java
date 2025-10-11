@@ -44,7 +44,7 @@ public class WorldRendererMixin {
     private void pushEntityRenders(MatrixStack matrices, WorldRenderState renderStates, OrderedRenderCommandQueue queue, CallbackInfo ci) {
         for (EntityRenderState entityRenderState : renderStates.entityRenderStates) {
             if(entityRenderState instanceof PlayerEntityRenderState) {
-                System.out.println("Removing from WorldRenderer: " + entityRenderState);
+//                System.out.println("Removing from WorldRenderer: " + entityRenderState);
                 StateStorage.currentStates.remove(entityRenderState);
             }
         }

@@ -33,7 +33,7 @@ public class InventoryScreenMixin {
                                                   LivingEntity entity
     ) {
         if(state instanceof PlayerEntityRenderState) {
-            System.out.println("Adding from InventoryScreen " + state);
+//            System.out.println("Adding from InventoryScreen " + state);
             StateStorage.currentStates.put(state, entity.getUuid());
         }
         return state;

@@ -26,7 +26,7 @@ public class GuiRendererMixin {
         this.state.forEachSpecialElement(state -> {
             if(state instanceof EntityGuiElementRenderState entityGuiElementRenderState) {
                 if(entityGuiElementRenderState.renderState() instanceof PlayerEntityRenderState) {
-                    System.out.println("Removing from GuiRenderer " + entityGuiElementRenderState.renderState());
+//                    System.out.println("Removing from GuiRenderer " + entityGuiElementRenderState.renderState());
                     StateStorage.currentStates.remove(entityGuiElementRenderState.renderState());
                 }
             }

@@ -35,7 +35,7 @@ public abstract class PlayerEntityRendererMixin<AvatarlikeEntity extends PlayerL
     )
     public void updateRenderState(AvatarlikeEntity playerLikeEntity, PlayerEntityRenderState state, float f, CallbackInfo ci) {
         if(playerLikeEntity instanceof ClientPlayerEntity clientPlayerEntity && state instanceof PlayerEntityRenderState) {
-            System.out.println("Adding from PlayerEntityRenderer: " + state);
+//            System.out.println("Adding from PlayerEntityRenderer: " + state);
             StateStorage.currentStates.put(state, clientPlayerEntity.getUuid());
         }
     }
