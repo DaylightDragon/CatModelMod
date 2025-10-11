@@ -8,7 +8,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.render.EntityGuiElementRenderer;
 import net.minecraft.client.gui.render.state.special.EntityGuiElementRenderState;
 import net.minecraft.client.render.*;
-import net.minecraft.client.render.entity.EntityRenderDispatcher;
+import net.minecraft.client.render.command.RenderDispatcher;
+import net.minecraft.client.render.entity.EntityRenderManager;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.client.render.entity.model.CatEntityModel;
 import net.minecraft.client.render.entity.model.PlayerEntityModel;
@@ -70,7 +71,7 @@ public class EntityGuiElementRendererMixin { // NEW
 //                VertexConsumerProvider vertexConsumerProvider = elementWVertexes.getVertexConsumers();
 
                 MinecraftClient mc = MinecraftClient.getInstance();
-                EntityRenderDispatcher dispatcher = mc.getEntityRenderDispatcher();
+                EntityRenderManager dispatcher = mc.getEntityRenderDispatcher();
                 CatEntity cat = (CatEntity) PlayerToCatReplacer.getCatForPlayer(mc.player);
 
                 if(cat == null) return;
@@ -89,7 +90,7 @@ public class EntityGuiElementRendererMixin { // NEW
 
                 Vector3f translation = state.translation();
 
-                if(ModStateUtils.shouldRenderCat(mc.player)) {
+                if(ModStateUtils.shouldRenderCat(mc.player)) {/*
                     try {
                         matrices.push();
                         matrices.translate(translation.x, translation.y, translation.z);
@@ -103,6 +104,10 @@ public class EntityGuiElementRendererMixin { // NEW
 
 //                    modifiableGuiElement.setRotation(quaternionf.conjugate(new Quaternionf()).rotateY((float) Math.PI));
 
+                        PlayerToCatReplacer.syncSittingAndLimbs(mc.player, cat);
+
+                        if(ConfigHandler.catDamageVisible.getCached()) renderState.hurt = playerEntityRenderState.hurt;
+                        else renderState.hurt = false;
 
                         dispatcher.setRenderShadows(false);
                         renderer.render(renderState, matrices, vertexConsumerProvider, LightmapTextureManager.MAX_LIGHT_COORDINATE);
@@ -111,7 +116,7 @@ public class EntityGuiElementRendererMixin { // NEW
                         t.printStackTrace();
                     } finally {
                         matrices.pop();
-                    }
+                    }*/
                 }
 
                 // Charge, disabled because doesn't work at all

@@ -124,6 +124,10 @@ public class PlayerToCatReplacer {
         existingCat.lastHeadYaw = player.lastHeadYaw;
         existingCat.headYaw = player.headYaw;
 
+        syncSittingAndLimbs(player, existingCat);
+    }
+
+    public static void syncSittingAndLimbs(PlayerEntity player, CatEntity existingCat) {
         // Sitting
         double dx = player.getX() - player.lastX;
         double dz = player.getZ() - player.lastZ;
@@ -135,17 +139,6 @@ public class PlayerToCatReplacer {
         boolean sitting = sneaking && slowEnough;
         existingCat.setInSittingPose(sitting);
 
-//        if (sitting) {
-//            // сбросить движение лап
-//            existingCat.limbAnimator.updateLimbs(0.0f, 1.0f, 1.0f);
-//
-//            if (existingCat.limbAnimator instanceof LimbAnimatorAccessor acc) {
-//                acc.setAnimationProgress(0.0f);
-//            }
-//        } else {
-
-//        System.out.println(getPlayerMovementSpeed(player) + " " + player.limbAnimator.getAnimationProgress());
-
         existingCat.limbAnimator.updateLimbs(
                 getPlayerMovementSpeed(player),
                 0.9f,
@@ -155,10 +148,9 @@ public class PlayerToCatReplacer {
         if (existingCat.limbAnimator instanceof LimbAnimatorAccessor acc) {
             acc.setAnimationProgress(player.limbAnimator.getAnimationProgress());
         }
-//        }
     }
 
-    private static float getPlayerMovementSpeed(AbstractClientPlayerEntity player) {
+    private static float getPlayerMovementSpeed(PlayerEntity player) {
         // Вычисляем скорость движения игрока
         double dx = player.getX() - player.lastX;
         double dz = player.getZ() - player.lastZ;

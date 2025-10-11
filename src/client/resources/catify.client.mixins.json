@@ -9,7 +9,7 @@
     "CatEntityRenderStateMixin",
     "EntityGuiElementRendererMixin",
     "EntityGuiElementRenderStateMixin",
-    "EntityRenderDispatcherMixin",
+    "EntityRenderManagerMixin",
     "EntityRendererAccessor",
     "EntityRendererMixin",
     "LimbAnimatorAccessor",
