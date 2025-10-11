@@ -103,6 +103,10 @@ public class EntityGuiElementRendererMixin { // NEW
 
 //                    modifiableGuiElement.setRotation(quaternionf.conjugate(new Quaternionf()).rotateY((float) Math.PI));
 
+                        PlayerToCatReplacer.syncSittingAndLimbs(mc.player, cat);
+
+                        if(ConfigHandler.catDamageVisible.getCached()) renderState.hurt = playerEntityRenderState.hurt;
+                        else renderState.hurt = false;
 
                         dispatcher.setRenderShadows(false);
                         renderer.render(renderState, matrices, vertexConsumerProvider, LightmapTextureManager.MAX_LIGHT_COORDINATE);
