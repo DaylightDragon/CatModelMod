@@ -1,8 +1,11 @@
 package org.daylight.mixin.client;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.SkinOverlayOwner;
 import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.util.Identifier;
 import org.daylight.CustomCatTextureHolder;
+import org.daylight.features.CatChargeFeatureRenderer;
 import org.daylight.util.PlayerToCatReplacer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -10,8 +13,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.UUID;
+
 @Mixin(CatEntity.class)
-public class CatEntityMixin implements CustomCatTextureHolder {
+public class CatEntityMixin implements CustomCatTextureHolder, SkinOverlayOwner {
     @Unique
     private Identifier customTexture = null;
     @Unique
@@ -55,4 +60,14 @@ public class CatEntityMixin implements CustomCatTextureHolder {
 //    public void catmodel$setChargeProgress(float value) {
 //        this.catmodel$chargeProgress = value;
 //    }
+
+
+    @Override
+    public boolean shouldRenderOverlay() {
+        if((Object) this instanceof CatEntity cat) {
+            CatChargeFeatureRenderer.CatChargeData data = CatChargeFeatureRenderer.getChargeData(cat);
+            return data.chargeActive;
+        }
+        return false;
+    }
 }

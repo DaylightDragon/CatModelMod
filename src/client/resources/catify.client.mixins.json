@@ -6,7 +6,6 @@
     "CatEntityAccessor",
     "CatEntityMixin",
     "CatEntityRendererMixin",
-    "CatEntityRenderStateMixin",
     "EntityRenderDispatcherMixin",
     "EntityRendererAccessor",
     "EntityRendererMixin",

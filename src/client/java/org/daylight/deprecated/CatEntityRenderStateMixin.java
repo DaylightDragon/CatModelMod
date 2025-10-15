@@ -1,14 +1,11 @@
-package org.daylight.mixin.client;
+package org.daylight.deprecated;
 
-import net.minecraft.client.render.entity.state.CatEntityRenderState;
-import net.minecraft.entity.Entity;
 import org.daylight.CustomCatState;
-import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
 import java.util.UUID;
 
-@Mixin(CatEntityRenderState.class)
+//@Mixin(CatEntityRenderState.class)
 public class CatEntityRenderStateMixin implements CustomCatState {
     @Unique
     private boolean catmodel$chargeActive = false;

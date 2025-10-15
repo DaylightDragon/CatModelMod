@@ -19,14 +19,16 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(PlayerEntityRenderer.class)
 public abstract class PlayerEntityRendererMixin {
-    @ModifyArg(
-            method = "renderRightArm",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/PlayerEntityRenderer;renderArm(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/util/Identifier;Lnet/minecraft/client/model/ModelPart;Z)V")
+    @ModifyVariable(
+            method = "renderArm(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/client/network/AbstractClientPlayerEntity;Lnet/minecraft/client/model/ModelPart;Lnet/minecraft/client/model/ModelPart;)V",
+            at = @At("STORE"),
+            ordinal = 0
     )
-    private Identifier replaceRightArmSkin(Identifier skinTexture) {
+    private Identifier replaceArmSkin(Identifier skinTexture) {
         if (ConfigHandler.catHandActive.getCached() && ConfigHandler.replacementActive.getCached() &&
                 PlayerToCatReplacer.shouldReplace(getPlayer())) {
 //            Optional<Resource> resource = MinecraftClient.getInstance().getResourceManager().getResource(ModResources.CAT_HAND_TEXTURE);
@@ -34,19 +36,6 @@ public abstract class PlayerEntityRendererMixin {
 //                MinecraftClient.getInstance().getTextureManager().registerTexture(ModResources.CAT_HAND_TEXTURE, new ResourceTexture(ModResources.CAT_HAND_TEXTURE));
 //            }
 //            return ModResources.CAT_HAND_TEXTURE; // твой кастомный текстурный идентификатор
-            return getHandTexture(skinTexture);
-        }
-        return skinTexture;
-    }
-
-    @ModifyArg(
-            method = "renderLeftArm",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/PlayerEntityRenderer;renderArm(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/util/Identifier;Lnet/minecraft/client/model/ModelPart;Z)V")
-    )
-    private Identifier replaceLeftArmSkin(Identifier skinTexture) {
-        if (ConfigHandler.catHandActive.getCached() && ConfigHandler.replacementActive.getCached()
-                && PlayerToCatReplacer.shouldReplace(getPlayer())) {
-//            return ModResources.CAT_HAND_TEXTURE;
             return getHandTexture(skinTexture);
         }
         return skinTexture;

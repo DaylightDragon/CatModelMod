@@ -1,9 +1,11 @@
 package org.daylight;
 
-import net.minecraft.client.render.entity.state.EntityRenderState;
+import net.minecraft.entity.Entity;
+import org.spongepowered.asm.mixin.Unique;
 
-public interface IShadowHolder<S extends EntityRenderState> {
-    float getShadowRadiusAccessor(S state);
+public interface IShadowHolder<T extends Entity> {
+    float catModel$getShadowOpacityAccessor();
 
-    float catModel$getShadowOpacityAccessor(S state);
+    @Unique
+    float getShadowRadiusAccessor(T entity);
 }

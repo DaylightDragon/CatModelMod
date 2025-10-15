@@ -7,7 +7,6 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.state.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.CatEntity;
@@ -28,7 +27,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(EntityRenderDispatcher.class)
 public abstract class EntityRenderDispatcherMixin {
     @Shadow
-    protected static void renderShadow(MatrixStack matrices, VertexConsumerProvider vertexConsumers, EntityRenderState renderState, float opacity, float tickDelta, WorldView world, float radius) {
+    public abstract double getSquaredDistanceToCamera(double x, double y, double z);
+
+    @Shadow
+    protected static void renderShadow(MatrixStack matrices, VertexConsumerProvider vertexConsumers, Entity entity, float opacity, float tickDelta, WorldView world, float radius) {
     }
 
     @Shadow
@@ -43,28 +45,19 @@ public abstract class EntityRenderDispatcherMixin {
 
     @SuppressWarnings("unchecked")
     @Inject(
-            method = "render(Lnet/minecraft/entity/Entity;DDDFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",
+            method = "Lnet/minecraft/client/render/entity/EntityRenderDispatcher;render(Lnet/minecraft/entity/Entity;DDDFFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",
             at = @At("HEAD"),
             cancellable = true
     )
-    private <E extends Entity> void onRenderEntity(
-            E entity,
-            double x, double y, double z,
-            float tickDelta,
-            MatrixStack matrices,
-            VertexConsumerProvider vertexConsumers,
-            int light,
-            CallbackInfo ci
-    ) {
+    private <E extends Entity> void onRenderEntity(E entity, double x, double y, double z, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
+//        renderShadow(matrices, vertexConsumers, entity, );
         if (ConfigHandler.replacementActive.getCached() && entity instanceof AbstractClientPlayerEntity player &&
                 PlayerToCatReplacer.shouldReplace(player)) {
             CatEntity existingCat = (CatEntity) PlayerToCatReplacer.getCatForPlayer(player);
-            EntityRenderer<CatEntity, EntityRenderState> catRenderer = null;
-            EntityRenderer<PlayerEntity, PlayerEntityRenderState> playerRenderer = null;
+            EntityRenderer<CatEntity> catRenderer = null;
+            EntityRenderer<PlayerEntity> playerRenderer = null;
             boolean visible = !player.isInvisible();
             InvisibilityBehaviour behaviour = (InvisibilityBehaviour) ConfigHandler.invisibilityBehaviour.getCached();
-            CatEntityRenderState catState = null;
-            PlayerEntityRenderState playerState = null;
 
             if (existingCat != null) {
                 PlayerToCatReplacer.syncEntity2(player, existingCat, tickDelta);
@@ -73,26 +66,31 @@ public abstract class EntityRenderDispatcherMixin {
                 matrices.translate(x, y, z);
 
                 try {
-                    catRenderer = (EntityRenderer<CatEntity, EntityRenderState>) this.getRenderer(existingCat);
+                    catRenderer = (EntityRenderer<CatEntity>) this.getRenderer(existingCat);
                     if(catRenderer instanceof CustomCatTextureHolder customCatTextureHolder) {
                         if(customCatTextureHolder.catModel$shouldUpdateCustomTexture()) {
-                            CatifyModClient.LOGGER.info("RenderDispatcher updates CatRenderer state");
-                            catRenderer.getAndUpdateRenderState(existingCat, 0);
+                            CatifyModClient.LOGGER.info("RenderDispatcher updates CatRenderer state"); // TODO UPDATE SKIN
+//                            catRenderer.getAndUpdateRenderState(existingCat, 0);
                         }
                     }
                     ci.cancel();
 
-                    catState = (CatEntityRenderState) catRenderer.getAndUpdateRenderState(existingCat, tickDelta);
+//                    catState = (CatEntityRenderState) catRenderer.getAndUpdateRenderState(existingCat, tickDelta);
 //                    if(catState instanceof CustomCatState customCatState) customCatState.catmodel$setChargeActive(false);
                     CatChargeFeatureRenderer.getChargeData(existingCat).chargeActive = false;
 
-                    if(playerState == null) playerState = (PlayerEntityRenderState) getRenderer(player).getAndUpdateRenderState(player, tickDelta);
-                    if(ConfigHandler.catDamageVisible.getCached()) catState.hurt = playerState.hurt;
-                    else catState.hurt = false;
+//                    if(playerState == null) playerState = (PlayerEntityRenderState) getRenderer(player).getAndUpdateRenderState(player, tickDelta);
+                    if(ConfigHandler.catDamageVisible.getCached()) {
+                        existingCat.hurtTime = player.hurtTime;
+                        existingCat.maxHurtTime = player.maxHurtTime; //catState.hurt = playerState.hurt; // TODO HURT
+                    } else {
+                        existingCat.hurtTime = 0;
+                    }
+//                    else catState.hurt = false;
 
                     if((visible || behaviour == InvisibilityBehaviour.NEVER)) {
                         // Just cat
-                        catRenderer.render(catState, matrices, vertexConsumers, light);
+                        catRenderer.render(existingCat, existingCat.bodyYaw, tickDelta, matrices, vertexConsumers, light);
                     }
                 } catch (ClassCastException e) {
                     CatifyModClient.LOGGER.error("The renderer is most likely not a EntityRenderer<CatEntity, EntityRenderState>", e);
@@ -106,21 +104,21 @@ public abstract class EntityRenderDispatcherMixin {
 //                    if(catRenderer == null) catRenderer = (EntityRenderer<CatEntity, EntityRenderState>) this.getRenderer(existingCat);
                     if(playerRenderer == null) playerRenderer = this.getRenderer(player);
 //                    if(catState == null) catState = (CatEntityRenderState) catRenderer.getAndUpdateRenderState(existingCat, tickDelta);
-                    playerState = (PlayerEntityRenderState) getRenderer(player).getAndUpdateRenderState(player, tickDelta);
+//                    playerState = (PlayerEntityRenderState) getRenderer(player).getAndUpdateRenderState(player, tickDelta);
                         try {
 //                        Vec3d vec3d = playerRenderer.getPositionOffset(playerState);
 
                         matrices.push();
                         matrices.translate(x, y, z);
 
-                        if (playerRenderer instanceof EntityRendererAccessor accessor && playerRenderer instanceof IShadowHolder shadowHolder) {
+                        if (playerRenderer instanceof IShadowHolder shadowHolder) {
                             if ((Boolean)this.gameOptions.getEntityShadows().getValue() && this.renderShadows) {
-                                float g = accessor.callGetShadowRadius(playerState);
+                                float g = shadowHolder.getShadowRadiusAccessor(player);
                                 if (g > 0.0F) {
-                                    double h = playerState.squaredDistanceToCamera;
-                                    float i = (float)(((double)1.0F - h / (double)256.0F) * (double) shadowHolder.catModel$getShadowOpacityAccessor(playerState)); // playerRenderer.getShadowOpacity(playerState) replaced with 1f in 1.21.3
+                                    double h = getSquaredDistanceToCamera(entity.getX(), entity.getY(), entity.getZ());
+                                    float i = (float)(((double)1.0F - h / (double)256.0F) * (double) shadowHolder.catModel$getShadowOpacityAccessor()); // playerRenderer.getShadowOpacity(playerState) replaced with 1f in 1.21.3
                                     if (i > 0.0F) {
-                                        renderShadow(matrices, vertexConsumers, playerState, i, tickDelta, player.getWorld(), Math.min(g, 32.0F));
+                                        renderShadow(matrices, vertexConsumers, player, i, tickDelta, player.getWorld(), Math.min(g, 32.0F));
                                     }
                                 }
                             }
@@ -139,20 +137,18 @@ public abstract class EntityRenderDispatcherMixin {
 
                 if(!visible && behaviour == InvisibilityBehaviour.CHARGED) {
                     if(catRenderer instanceof IFeatureManager featureManager) {
-                        if(catState == null) catState = (CatEntityRenderState) catRenderer.getAndUpdateRenderState(existingCat, tickDelta);
-
                         matrices.push();
 
                         try {
-                            float bodyYaw = catState.bodyYaw; // or entity.getBodyYaw(tickDelta)
+                            float bodyYaw = existingCat.bodyYaw; // or entity.getBodyYaw(tickDelta)
                             matrices.translate(x, y, z); // inherited from normal cat render
                             matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0F - bodyYaw));
                             matrices.scale(-1.0F, -1.0F, 1.0F);
-                            matrices.translate(0.0f, -1.501f, 0.0f);
+                            matrices.translate(0.0f, -1f, 0.0f); // -1.501f
 
                             CatChargeFeatureRenderer.getChargeData(existingCat).chargeActive = true;
 
-                            featureManager.renderAllFeatures(catState, matrices, vertexConsumers, light, featureRenderer -> featureRenderer instanceof CatChargeFeatureRenderer);
+                            featureManager.catmodel$renderAllFeatures(existingCat, matrices, vertexConsumers, light, featureRenderer -> featureRenderer instanceof CatChargeFeatureRenderer);
                         } catch (Throwable e) {
                             e.printStackTrace();
                         } finally {
@@ -164,7 +160,6 @@ public abstract class EntityRenderDispatcherMixin {
                 // Hitboxes
 
                 if (shouldRenderHitboxes()) {
-                    if(playerState == null) playerState = (PlayerEntityRenderState) getRenderer(player).getAndUpdateRenderState(player, tickDelta);
                     if(vertexConsumers.getBuffer(RenderLayer.LINES) != null) {
                         try {
                             matrices.push();

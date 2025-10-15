@@ -73,7 +73,7 @@ public class PlayerToCatReplacer {
         }
 
         return client.world.getRegistryManager()
-                .getOrThrow(RegistryKeys.CAT_VARIANT)
+                .get(RegistryKeys.CAT_VARIANT)
                 .getEntry(variantKey.getValue())
                 .orElseThrow(() -> new IllegalStateException("Cat variant not found: " + variantKey));
     }
@@ -148,8 +148,7 @@ public class PlayerToCatReplacer {
 
         existingCat.limbAnimator.updateLimbs(
                 getPlayerMovementSpeed(player),
-                0.9f,
-                1.0f
+                0.9f // TODO idk what to put here
         );
 
         if (existingCat.limbAnimator instanceof LimbAnimatorAccessor acc) {
